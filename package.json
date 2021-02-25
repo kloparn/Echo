@@ -1,0 +1,22 @@
+{
+  "name": "youtube-node",
+  "version": "1.0.0",
+  "description": "private music bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adam Håkansson",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "ytdl-core-discord": "^1.2.5"
+  },
+  "devDependencies": {
+    "@discordjs/opus": "^0.4.0",
+    "eslint": "^7.20.0",
+    "node-opus": "^0.3.3",
+    "youtube-search": "^1.1.6"
+  }
+}
