@@ -7,6 +7,7 @@ const options = {
 }
 
 module.exports = async (connection, url) => {
+    console.log("this should be an url: ", url)
     if(url.includes("www.youtube.com")) {
          //returns a dispatch object which can be controlled to pause and or fix a queue system. 
         return connection.play(await ytdl(url), { type: 'opus'});
@@ -19,7 +20,6 @@ module.exports = async (connection, url) => {
             return console.log("error: ", error);
         }   
         const firstResult = youtubeSearchData[0];
-        console.log("link: ", firstResult.link)
 
         return connection.play(await ytdl(firstResult.link), { type: 'opus'});
     }
