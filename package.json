@@ -13,6 +13,9 @@
     "discord.js": "^12.5.1",
     "ytdl-core-discord": "^1.2.5"
   },
+  "engines": {
+    "node": "14.15.5"
+  },
   "devDependencies": {
     "@discordjs/opus": "^0.4.0",
     "eslint": "^7.20.0",

@@ -3,7 +3,7 @@ const search = require("youtube-search");
 
 const options = {
     maxResults: 1,
-    key: require("../config.json")["google-api-key"]
+    key: process.env["google-api-key"] || require("../config.json")["google-api-key"]
 }
 
 module.exports = async (client , url) => {

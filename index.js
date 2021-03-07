@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const { token, prefix } = require("./config.json");
+const token = process.env.token || require("./config.json").token;
+const prefix = process.env.token || require("./config.json").prefix;
 const voiceConnected = require("./helpers/voiceConnected");
 const playSound = require("./helpers/playSound");
 const setupEvents = require("./helpers/setupEvents");
