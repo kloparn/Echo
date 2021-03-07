@@ -6,11 +6,12 @@ const options = {
     key: require("../config.json")["google-api-key"]
 }
 
-module.exports = async (connection, url) => {
+module.exports = async (client , url) => {
     console.log("this should be an url: ", url)
-    if(url.includes("www.youtube.com")) {
-         //returns a dispatch object which can be controlled to pause and or fix a queue system. 
-        return connection.play(await ytdl(url), { type: 'opus'});
+    if(url.includes("https")) {
+        //returns a dispatch object which can be controlled to pause and or fix a queue system. 
+        dispatcher = client.connection.play(await ytdl(url), { type: 'opus'});
+        return dispatcher;
     } else {
         //now we are searching for a video on youtube
         let youtubeSearchData;
@@ -19,9 +20,13 @@ module.exports = async (connection, url) => {
         } catch (error) {
             return console.log("error: ", error);
         }   
-        const firstResult = youtubeSearchData[0];
-
-        return connection.play(await ytdl(firstResult.link), { type: 'opus'});
+        if(!youtubeSearchData[0]){
+            client.channelReference.send("Didn't get a search result!");
+            return;
+        } 
+        const {link, title, url: soundUrl} = youtubeSearchData[0];
+        
+        return client.connection.play(await ytdl(link), { type: 'opus'});
     }
 }
 

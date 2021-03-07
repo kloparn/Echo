@@ -14,12 +14,28 @@ client.on("ready", () => {
   user = client.user;
 });
 
+var removeNonUtf8 = (characters) => {
+  try {
+      // ignore invalid char ranges
+      var bytelike = unescape(encodeURIComponent(characters));
+      characters = decodeURIComponent(escape(bytelike));
+  } catch (error) {
+    console.log(error)
+   }
+  // remove �
+  characters = characters.replace(/\uFFFD/g, '');
+  return characters;
+};
+
 client.on("message", async (msg) => {
   if (!msg.content.startsWith(prefix) || msg.author.bot) return;
 
   // Setup command and args.
-  const args = msg.content.slice(prefix.length).split(/ +/);
+  let args = msg.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
+  console.log("message ",msg.content);
+  if(!msg.content.includes("https"))
+    args = args.map(str => removeNonUtf8(str)).filter(arg => arg !== ''); //removes all NON alphanumerical values)
   switch (commandName) {
     case "play":
       if(!msg.member.voice.channel) return msg.reply(`You are currently not in a channel`)
@@ -33,7 +49,13 @@ client.on("message", async (msg) => {
         return msg.channel.send(`Added '${args.join(" ")}' to the queue`);
       }
       //returns a dispatcher to be used to check queue or other stuff
-      client.dispatcher = await playSound(client.connection, args.join(" "));
+      client.dispatcher = await playSound(client, args.join(" "));
+      if(!client.dispatcher){
+        console.log("didn't get a dispatcher")
+        client.voiceChannelReference.leave();
+        return destroyClientConnection(client);;
+      }
+        
       setupEvents(client);
 
       return  msg.reply(`playing: ${args.join(" ")}`);
