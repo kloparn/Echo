@@ -33,7 +33,6 @@ client.on("message", async (msg) => {
   // Setup command and args.
   let args = msg.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
-  console.log("message ",msg.content);
   if(!msg.content.includes("https"))
     args = args.map(str => removeNonUtf8(str)).filter(arg => arg !== ''); //removes all NON alphanumerical values)
   switch (commandName) {
@@ -46,7 +45,7 @@ client.on("message", async (msg) => {
 
       if(client.dispatcher) {
         client.queue.push({ str : args.join(" "), endEvent : setupEvents });
-        return msg.channel.send(`Added '${args.join(" ")}' to the queue`);
+        return msg.channel.send(`Added '<${args.join(" ")}>' to the queue`);
       }
       //returns a dispatcher to be used to check queue or other stuff
       client.dispatcher = await playSound(client, args.join(" "));
@@ -58,7 +57,7 @@ client.on("message", async (msg) => {
         
       setupEvents(client);
 
-      return  msg.reply(`playing: ${args.join(" ")}`);
+      return;
     case "skip":
       if(!voiceConnected(client, user)) return msg.reply("im not connected");
       return client.dispatcher.end();

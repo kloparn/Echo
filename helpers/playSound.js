@@ -7,7 +7,7 @@ const options = {
 }
 
 module.exports = async (client , url) => {
-    console.log("this should be an url: ", url)
+    console.log(`playing :${url}`)
     if(url.includes("https")) {
         //returns a dispatch object which can be controlled to pause and or fix a queue system. 
         dispatcher = client.connection.play(await ytdl(url), { type: 'opus'});
@@ -24,7 +24,9 @@ module.exports = async (client , url) => {
             client.channelReference.send("Didn't get a search result!");
             return;
         } 
-        const {link, title, url: soundUrl} = youtubeSearchData[0];
+        const {link, title} = youtubeSearchData[0];
+
+        client.channelReference.send(`Playing : ${title}\nUrl: <${link}>`);
         
         return client.connection.play(await ytdl(link), { type: 'opus'});
     }
