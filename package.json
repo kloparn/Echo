@@ -1,25 +1,33 @@
 {
-  "name": "youtube-node",
+  "name": "youtube-bot-new",
   "version": "1.0.0",
-  "description": "private music bot",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsc && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -r node_modules && rm package-lock.json && npm i"
   },
-  "author": "Adam Håkansson",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kloparn/Echo.git"
+  },
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "dependencies": {
-    "discord.js": "^12.5.1",
-    "ytdl-core-discord": "^1.2.5"
+  "bugs": {
+    "url": "https://github.com/kloparn/Echo/issues"
   },
-  "engines": {
-    "node": "14.15.5"
+  "homepage": "https://github.com/kloparn/Echo#readme",
+  "dependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^14.14.34",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
-    "@discordjs/opus": "^0.4.0",
-    "eslint": "^7.20.0",
-    "node-opus": "^0.3.3",
-    "youtube-search": "^1.1.6"
+    "discord.js": "^12.5.1",
+    "minimist": "^1.2.5",
+    "tslint": "^6.1.3",
+    "typescript": "^4.2.3"
   }
 }
