@@ -1,5 +1,8 @@
-import { Client } from "discord.js";
+import ClientMemory from "../classes/ClientMemory";
+const globalData = ClientMemory.getInstance();
 
-export default (client: Client) => {
-
-}
+export = () => {
+  globalData.voiceStatus
+    ? globalData.dispatcher.pause()
+    : globalData.channel.send("im not connected");
+};
