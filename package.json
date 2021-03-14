@@ -1,8 +1,8 @@
 {
-  "name": "youtube-bot-new",
+  "name": "echo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Discord youtube bot",
+  "main": "src/index.ts",
   "scripts": {
     "start": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,8 +12,8 @@
     "type": "git",
     "url": "git+https://github.com/kloparn/Echo.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["discord", "youtube", "bot", "typescript"],
+  "author": "Adam Håkansson",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kloparn/Echo/issues"
