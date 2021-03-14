@@ -5,7 +5,7 @@ import { playSound } from "../helpers/playSound";
 const globalData = ClientMemory.getInstance();
 
 export = async (args, msg) => {
-  if (globalData.voiceStatus){
+  if (globalData.isConnectedToVoice){
     globalData.channel.send(`${args.join(" ")} added to the queue, it's in position ${globalData.queue.length + 1}`)
     return clientHandler.addToQueue(args.join(" "));
   } 

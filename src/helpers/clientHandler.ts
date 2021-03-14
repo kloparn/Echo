@@ -5,7 +5,7 @@ const globalData = ClientMemory.getInstance();
 
 const setupClient = async (userMessage: Message) => {
   globalData.channel = userMessage.channel as TextChannel;
-  globalData.voiceStatus = true;
+  globalData.isConnectedToVoice = true;
   globalData.voiceChannel = userMessage.member.voice.channel;
   globalData.connection = await userMessage.member.voice.channel.join();
   //console.log(globalData);
