@@ -19,11 +19,9 @@ export default class ClientMemory {
 
     return ClientMemory.instance;
   }
-  public static wipeInstance(): ClientMemory {
+  public static wipeInstance(){
     const memory = ClientMemory.getInstance();
     memory.queue = [];
     memory.voiceStatus = false;
-
-    return ClientMemory.instance;
   }
 }
