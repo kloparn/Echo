@@ -11,14 +11,13 @@ const options = {
   key: process.env.GOOGLE_KEY,
 };
 
-
 export const playSound = async (url: string) => {
   console.log(url);
-  if (url.includes("https"))
-    clientHandler.setDispatcher(
-      globalData.connection.play(await ytdl(url), { type: "opus" })
-    );
-  else {
+  if (url.includes("https")) {
+    clientHandler.setDispatcher(globalData.connection.play(await ytdl(url), { type: "opus" }))
+    const youtubeVideoInfo = await searchAsync(url); 
+    globalData.channel.send(`Playing: ${youtubeVideoInfo[0].title}\nurl: <${youtubeVideoInfo[0].link}>`);
+  } else {
     const youtubeSearchData = await searchAsync(url);
 
     if (!youtubeSearchData[0])
