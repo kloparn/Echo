@@ -23,5 +23,6 @@ export default class ClientMemory {
     const memory = ClientMemory.getInstance();
     memory.queue = [];
     memory.isConnectedToVoice = false;
+    memory.dispatcher = null;
   }
 }
