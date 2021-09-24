@@ -15,14 +15,14 @@ A :- Definitely not! How to use it is explained down below!
 
 Prerequisites: 
 * node 14+
-* youtube api token
+* discord bot token
 * google key
 
-As you need a youtube api token & google key you need to setup a `.env` file.
+As you need a discord bot token & google key you need to setup a `.env` file.
 
 it should look something like this
 ```bash
-TOKEN=[YOUTUBE_API_TOKEN]
+TOKEN=[DISCORD_BOT_TOKEN]
 PREFIX=.
 GOOGLE_KEY=[GOOGLE_KEY]
 ```
