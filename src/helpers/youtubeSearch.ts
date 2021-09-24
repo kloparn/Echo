@@ -1,6 +1,6 @@
 import search from "youtube-search";
 
-export const multipleSearch = async (url: string, maxResults: number): Promise<[Object]> => {
+export const multipleSearch = async (url: string, maxResults: number) => {
   const options = {
     maxResults,
     key: process.env.GOOGLE_KEY,
@@ -9,7 +9,7 @@ export const multipleSearch = async (url: string, maxResults: number): Promise<[
   const youtubeSearchData: any = await searchAsync(url, options);
 
   if (!youtubeSearchData[0]) {
-    return [{}];
+    return [];
   }
 
   return youtubeSearchData;

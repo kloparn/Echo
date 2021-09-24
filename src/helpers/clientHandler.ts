@@ -8,7 +8,6 @@ const setupClient = async (userMessage: Message) => {
   globalData.isConnectedToVoice = true;
   globalData.voiceChannel = userMessage.member.voice.channel;
   globalData.connection = await userMessage.member.voice.channel.join();
-  //console.log(globalData);
 };
 
 const setDispatcher = (dispatcher: StreamDispatcher) =>
@@ -21,7 +20,6 @@ const getFromQueue = (): string => globalData.queue.shift();
 const destroyClient = () => {
   globalData.voiceChannel.leave();
   ClientMemory.wipeInstance();
-  //console.log(globalData);
 };
 
 export default {

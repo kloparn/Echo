@@ -12,9 +12,8 @@ const options = {
 };
 
 export const playSound = async (url: string) => {
-  console.log(url);
   if (url.includes("https")) {
-    clientHandler.setDispatcher(globalData.connection.play(await ytdl(url), { type: "opus" }))
+    clientHandler.setDispatcher(globalData.connection.play(await ytdl(url), { type: "opus" }));
     const youtubeVideoInfo = await searchAsync(url); 
     globalData.channel.send(`Playing: ${youtubeVideoInfo[0].title}\nurl: <${youtubeVideoInfo[0].link}>`);
   } else {
