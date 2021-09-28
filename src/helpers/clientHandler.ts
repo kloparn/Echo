@@ -10,7 +10,7 @@ const setupClient = async (userMessage: Message) => {
   globalData.connection = await userMessage.member.voice.channel.join();
 };
 
-const setDispatcher = (dispatcher: StreamDispatcher) =>
+const setDispatcher = (dispatcher: any) =>
   (globalData.dispatcher = dispatcher);
 
 const addToQueue = (url: string) => globalData.queue.push(url);
