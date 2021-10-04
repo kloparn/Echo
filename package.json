@@ -4,9 +4,11 @@
   "description": "Discord youtube bot",
   "main": "src/index.ts",
   "scripts": {
-    "start": "tsc && babel ./src -d ./dist --extensions .ts && node dist/index.js",
+    "start": "babel ./src -d ./dist --extensions .ts && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rm -r node_modules && rm package-lock.json && npm i"
+    "tsc": "tsc",
+    "clean": "rm -r node_modules && rm package-lock.json && npm i",
+    "postinstall": "npm run tsc"
   },
   "repository": {
     "type": "git",
