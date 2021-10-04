@@ -5,7 +5,7 @@ import { multipleSearch } from "../helpers/youtubeSearch";
 
 const globalData = ClientMemory.getInstance();
 
-export = async (args, msg) => {
+const execute = async (args, msg) => {
   const searchTerm = args.join(" ")
   await clientHandler.setupClient(msg);
   const allVideos = await multipleSearch(searchTerm, 5);
@@ -33,3 +33,8 @@ export = async (args, msg) => {
     messages.length = 0;
   })
 };
+
+export default {
+  execute,
+  alias: []
+}

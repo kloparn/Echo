@@ -1,7 +1,7 @@
 import ClientMemory from "../classes/ClientMemory";
 const globalData = ClientMemory.getInstance();
 
-export = (args: any) => {
+const execute = (args: any) => {
   if (args.length === 0) {
     globalData.isConnectedToVoice
       ? globalData.dispatcher.end()
@@ -17,3 +17,8 @@ export = (args: any) => {
     }
   }
 };
+
+export default {
+  execute,
+  alias: ["s"]
+}

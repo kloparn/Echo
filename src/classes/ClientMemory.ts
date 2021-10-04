@@ -1,5 +1,7 @@
-import { Channel, StreamDispatcher, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
+import { StreamDispatcher, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
 
+// Global object to keep track of where the bot currently is
+// and what other memory related stuff.
 export default class ClientMemory {
   private static instance: ClientMemory;
   public voiceChannel: VoiceChannel;

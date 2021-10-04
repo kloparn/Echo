@@ -2,7 +2,7 @@ import ClientMemory from "../classes/ClientMemory";
 import clientHandler from "../helpers/clientHandler";
 const globalData = ClientMemory.getInstance();
 
-export = (args, msg, timeOut) => {
+const execute = (args, msg, timeOut) => {
   console.log(timeOut);
   if(globalData.isConnectedToVoice) {
     {
@@ -17,3 +17,8 @@ export = (args, msg, timeOut) => {
     return globalData.channel.send("im not connected");
   }
 };
+
+export default {
+  execute: execute,
+  alias: []
+}

@@ -43,7 +43,7 @@ export const playSound = async (url: string) => {
     if (!url) {
       clientHandler.setDispatcher(null);
       setTimeout(() => {
-        stop([], null, true);
+        stop.execute([], null, true);
       }, 300000);
     };
   
