@@ -3,7 +3,6 @@ import clientHandler from "../helpers/clientHandler";
 const globalData = ClientMemory.getInstance();
 
 const execute = (args, msg, timeOut) => {
-  console.log(timeOut);
   if(globalData.isConnectedToVoice) {
     {
       if(!globalData.dispatcher && timeOut) {
@@ -14,7 +13,7 @@ const execute = (args, msg, timeOut) => {
       }
     }
   } else {
-    return globalData.channel.send("im not connected");
+    if (!timeOut) return globalData.channel.send("im not connected");
   }
 };
 
