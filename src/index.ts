@@ -22,23 +22,18 @@ client.on("message", async (msg) => {
     command.execute(args, msg);
   } catch (_) { // It could not find the file with the command given
 
-    let fileFound = false;
-
     // Getting all avaiable commands to search if the given command is a alias
-    const files: any = await fs.promises.readdir("./dist/commands");
+    const files: string[] = await fs.promises.readdir("./dist/commands");
 
-    files.every((file: string) => {
-      const { default: commandFile} = require(`./commands/${file}`)
-      // Checks if the given command is a alias for the current command file.
-      if(commandFile.alias.includes(commandName)){
-        commandFile.execute(args, msg);
-        fileFound = true
-        return false; // Stops the loop early.
+    for (const file of files) {
+      const { default: command} = require(`./commands/${file}`)
+      if(command.alias.includes(commandName)) {
+        command.execute(args, msg);
+        return;
       }
-      return true;
-    })
-    if (!fileFound)
-      msg.channel.send(`Sorry did not recognize the command *${commandName}*`);
+    }
+
+    return msg.channel.send(`Sorry did not recognize the command *${commandName}*`);
   }
 });
 

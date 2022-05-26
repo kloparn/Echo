@@ -17,6 +17,8 @@ const addToQueue = (url: string) => globalData.queue.push(url);
 
 const getFromQueue = (): string => globalData.queue.shift();
 
+const updatePlaying = () => globalData.paused = !globalData.paused; 
+
 const destroyClient = () => {
   globalData.voiceChannel.leave();
   ClientMemory.wipeInstance();
@@ -28,4 +30,5 @@ export default {
   setDispatcher: setDispatcher,
   addToQueue: addToQueue,
   getFromQueue: getFromQueue,
+  updatePlaying: updatePlaying,
 };

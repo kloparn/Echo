@@ -10,10 +10,12 @@ export default class ClientMemory {
   public isConnectedToVoice: Boolean;
   public dispatcher: StreamDispatcher;
   public connection: VoiceConnection;
+  public paused: Boolean;
 
   private constructor() {
     this.queue = [];
     this.isConnectedToVoice = false;
+    this.paused = false;
   }
 
   public static getInstance(): ClientMemory {
@@ -25,6 +27,7 @@ export default class ClientMemory {
     const memory = ClientMemory.getInstance();
     memory.queue = [];
     memory.isConnectedToVoice = false;
+    memory.paused = false;
     memory.dispatcher = null;
   }
 }
