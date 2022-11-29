@@ -1,6 +1,6 @@
 import ClientMemory from "../classes/ClientMemory";
 import ytdl from "ytdl-core-discord";
-import search, { YouTubeSearchOptions } from "youtube-search";
+import search, { YouTubeSearchOptions, YouTubeSearchResults } from "youtube-search";
 import clientHandler from "./clientHandler";
 import stop from "../commands/stop";
 import { Readable } from "stream";
@@ -12,92 +12,85 @@ const opts: YouTubeSearchOptions = {
   key: process.env.GOOGLE_KEY,
 };
 
-export const playSound = async (url: any) => {
-  if (!url) return;
+interface videoObject {
+  link: string;
+  title: string;
+}
 
-  let youtubeSearchData: Promise<[]>;
-  let link;
+const listenOnFinishEvent = () => {
+  if (globalData.dispatcher) {
+    globalData.dispatcher.on("finish", async () => {
+      const nextSearch = clientHandler.getFromQueue();
 
-  if (url.includes("https")) {
-    try {
-      youtubeSearchData = await searchAsync(url);
-    } catch (err) {
-      return globalData.channel.send("Could not retrieve video information");
-    }
-
-    if (!youtubeSearchData[0]) {
-      if (globalData.queue.length > 0) {
-        globalData.channel.send(`Could not get a result from <${url}>`);
-        globalData.channel.send("Playing next song in queue instead");
-
-        return await playSound(clientHandler.getFromQueue());
+      if (!nextSearch) {
+        startDisconnectTimeout();
+      } else {
+        await playVideo(await getVideo(nextSearch));
       }
+    });
+  }
+};
 
-      return globalData.channel.send(`Could not get a result from <${url}>`);
-    }
+const startDisconnectTimeout = () => {
+  clientHandler.setDispatcher(null);
+  setTimeout(() => {
+    stop.execute([], null, true);
+  }, 300_000);
+};
 
-    globalData.channel.send(`Playing: ${youtubeSearchData[0].title}\nurl: <${youtubeSearchData[0].link}>`);
-  } else {
-    try {
-      youtubeSearchData = await searchAsync(url);
-    } catch (err) {
-      return globalData.channel.send("Could not retrieve video information");
-    }
-
-    if (!youtubeSearchData[0]) return globalData.channel.send("Didn't get a search result");
-
-    let { link: youtubeLink, title } = youtubeSearchData[0];
-
-    while (youtubeLink.includes("playlist")) {
-      let linkIndex = (await youtubeSearchData).findIndex((youtubeResults: any) => youtubeResults.link === youtubeLink);
-      youtubeLink = youtubeSearchData[linkIndex + 1].link;
-      title = youtubeSearchData[linkIndex + 1].title;
-      if (!youtubeLink) return globalData.channel.send("Only found playlists in the results, skipping this search...");
-    }
-
-    link = youtubeLink;
-
-    globalData.channel.send(`Playing: ${title}\nUrl: <${youtubeLink}>`);
+const playVideo = async (video: videoObject) => {
+  if (!video) {
+    messageChannel("No video was found from the given link/title");
+    return;
   }
 
   try {
-    const youtubeMP3: Readable = await ytdl(link || url);
-    clientHandler.setDispatcher(globalData.connection.play(youtubeMP3, { type: "opus" }));
-  } catch (err) {
-    globalData.channel.send("Could not play song...");
-    const url = clientHandler.getFromQueue();
-    if (!url) {
-      clientHandler.setDispatcher(null);
-      setTimeout(() => {
-        stop.execute([], null, true);
-      }, 300000);
+    const youtubeStreamable: Readable = await ytdl(video.link);
+    clientHandler.setDispatcher(globalData.connection.play(youtubeStreamable, { type: "opus" }));
+    messageChannel(`Playing: ${video.title}/nurl: <${video.link}>`);
+  } catch (e) {
+    messageChannel("Could not start song...");
+    const nextSearch = clientHandler.getFromQueue();
+
+    if (!nextSearch) {
+      startDisconnectTimeout();
+    } else {
+      await playVideo(await getVideo(nextSearch));
     }
-
-    await playSound(url);
   }
-
-  if (globalData.dispatcher !== null)
-    globalData.dispatcher.on("finish", async () => {
-      const url = clientHandler.getFromQueue();
-      if (!url) {
-        clientHandler.setDispatcher(null);
-        setTimeout(() => {
-          stop.execute([], null, true);
-        }, 300000);
-      }
-
-      await playSound(url);
-    });
 };
 
-const searchAsync = async (url): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    search(url, opts, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
+const messageChannel = (str: string) => globalData.channel.send(str);
+
+const getVideo = async (uri: string): Promise<videoObject | null> => {
+  const videos: YouTubeSearchResults[] = (await trySearch(uri, "Could not find any video...")).results;
+
+  if (!videos || !videos[0]) return null;
+
+  for (const video of videos) {
+    if (video.link.includes("playlist")) continue;
+
+    return { link: video.link, title: video.title };
+  }
+
+  return null;
+};
+
+const trySearch = async (find: string, errMsg: string) => {
+  try {
+    return await search(find, opts);
+  } catch (e) {
+    messageChannel(errMsg);
+    return null;
+  }
+};
+
+export const playSound = async (search: string) => {
+  if (!search || search.length === 0) return;
+
+  const video: videoObject | null = await getVideo(search);
+
+  await playVideo(video);
+
+  listenOnFinishEvent();
 };
