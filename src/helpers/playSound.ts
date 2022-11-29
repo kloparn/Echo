@@ -47,7 +47,7 @@ const playVideo = async (video: videoObject) => {
   try {
     const youtubeStreamable: Readable = await ytdl(video.link);
     clientHandler.setDispatcher(globalData.connection.play(youtubeStreamable, { type: "opus" }));
-    messageChannel(`Playing: ${video.title}/nurl: <${video.link}>`);
+    messageChannel(`Playing: ${video.title}\nurl: <${video.link}>`);
   } catch (e) {
     messageChannel("Could not start song...");
     const nextSearch = clientHandler.getFromQueue();
