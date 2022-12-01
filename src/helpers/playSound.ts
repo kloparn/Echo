@@ -4,6 +4,8 @@ import search, { YouTubeSearchOptions, YouTubeSearchResults } from "youtube-sear
 import clientHandler from "./clientHandler";
 import stop from "../commands/stop";
 import { Readable } from "stream";
+import { validateURL } from "ytdl-core";
+import { Message } from "discord.js";
 
 const globalData = ClientMemory.getInstance();
 
@@ -38,29 +40,33 @@ const startDisconnectTimeout = () => {
   }, 300_000);
 };
 
-const playVideo = async (video: videoObject) => {
+const playVideo = async (video: videoObject, directLink?: string | undefined): Promise<any> => {
   if (!video) {
-    messageChannel("No video was found from the given link/title");
+    await messageChannel("No video was found from the given link/title");
     return;
   }
 
   try {
-    const youtubeStreamable: Readable = await ytdl(video.link);
+    const youtubeStreamable: Readable = await ytdl(directLink || video.link);
     clientHandler.setDispatcher(globalData.connection.play(youtubeStreamable, { type: "opus" }));
-    messageChannel(`Playing: ${video.title}\nurl: <${video.link}>`);
+    await messageChannel(`Playing: ${video.title}\nurl: <${video.link}>`);
   } catch (e) {
-    messageChannel("Could not start song...");
+    await messageChannel("Could not start song...");
     const nextSearch = clientHandler.getFromQueue();
 
     if (!nextSearch) {
-      startDisconnectTimeout();
+      return startDisconnectTimeout();
     } else {
-      await playVideo(await getVideo(nextSearch));
+      if (validateURL(nextSearch)) {
+        return await playVideo(await getVideo(nextSearch), nextSearch);
+      } else {
+        return await playVideo(await getVideo(nextSearch));
+      }
     }
   }
 };
 
-const messageChannel = (str: string) => globalData.channel.send(str);
+const messageChannel = (str: string): Promise<Message> => globalData.channel.send(str);
 
 const getVideo = async (uri: string): Promise<videoObject | null> => {
   const videos: YouTubeSearchResults[] = (await trySearch(uri, "Could not find any video...")).results;
@@ -76,11 +82,11 @@ const getVideo = async (uri: string): Promise<videoObject | null> => {
   return null;
 };
 
-const trySearch = async (find: string, errMsg: string) => {
+const trySearch = async (find: string, errMsg: string): Promise<{results: search.YouTubeSearchResults[], pageInfo: search.YouTubeSearchPageResults}> => {
   try {
     return await search(find, opts);
   } catch (e) {
-    messageChannel(errMsg);
+    await messageChannel(errMsg);
     return null;
   }
 };
@@ -90,7 +96,11 @@ export const playSound = async (search: string) => {
 
   const video: videoObject | null = await getVideo(search);
 
-  await playVideo(video);
+  if (validateURL(search)) {
+    await playVideo(video, search);
+  } else {
+    await playVideo(video);
+  }
 
   listenOnFinishEvent();
 };
