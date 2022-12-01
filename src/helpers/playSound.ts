@@ -43,13 +43,14 @@ const startDisconnectTimeout = () => {
 const playVideo = async (video: videoObject, directLink?: string | undefined): Promise<any> => {
   if (!video) {
     await messageChannel("No video was found from the given link/title");
-    return;
+    return null;
   }
 
   try {
     const youtubeStreamable: Readable = await ytdl(directLink || video.link);
     clientHandler.setDispatcher(globalData.connection.play(youtubeStreamable, { type: "opus" }));
     await messageChannel(`Playing: ${video.title}\nurl: <${video.link}>`);
+    listenOnFinishEvent();
   } catch (e) {
     await messageChannel("Could not start song...");
     const nextSearch = clientHandler.getFromQueue();
@@ -82,7 +83,10 @@ const getVideo = async (uri: string): Promise<videoObject | null> => {
   return null;
 };
 
-const trySearch = async (find: string, errMsg: string): Promise<{results: search.YouTubeSearchResults[], pageInfo: search.YouTubeSearchPageResults}> => {
+const trySearch = async (
+  find: string,
+  errMsg: string
+): Promise<{ results: search.YouTubeSearchResults[]; pageInfo: search.YouTubeSearchPageResults }> => {
   try {
     return await search(find, opts);
   } catch (e) {
@@ -101,6 +105,4 @@ export const playSound = async (search: string) => {
   } else {
     await playVideo(video);
   }
-
-  listenOnFinishEvent();
 };
