@@ -1,5 +1,6 @@
-import { Message, StreamDispatcher, TextChannel } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
+import { QueueObject } from "../interfaces";
 
 const globalData = ClientMemory.getInstance();
 
@@ -10,14 +11,13 @@ const setupClient = async (userMessage: Message) => {
   globalData.connection = await userMessage.member.voice.channel.join();
 };
 
-const setDispatcher = (dispatcher: any) =>
-  (globalData.dispatcher = dispatcher);
+const setDispatcher = (dispatcher: any) => (globalData.dispatcher = dispatcher);
 
-const addToQueue = (url: string) => globalData.queue.push(url);
+const addToQueue = (queueItem: QueueObject) => globalData.queue.push(queueItem);
 
-const getFromQueue = (): string => globalData.queue.shift();
+const getFromQueue = (): QueueObject => globalData.queue.shift();
 
-const updatePlaying = () => globalData.paused = !globalData.paused; 
+const updatePlaying = () => (globalData.paused = !globalData.paused);
 
 const destroyClient = () => {
   globalData.voiceChannel.leave();

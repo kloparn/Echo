@@ -1,5 +1,6 @@
 import ClientMemory from "../classes/ClientMemory";
 import clientHandler from "../helpers/clientHandler";
+import sendMessage from "../helpers/sendMessage";
 const globalData = ClientMemory.getInstance();
 
 const execute = () => {
@@ -7,12 +8,12 @@ const execute = () => {
     if(!globalData.paused) {
       globalData.dispatcher.pause(); 
       clientHandler.updatePlaying();
-      globalData.channel.send(`Paused song`);
+      sendMessage(`Paused song`);
     } else {
-      globalData.channel.send("Im already paused")
+      sendMessage("Im already paused")
     }
   } else {
-    globalData.channel.send("im not connected");
+    sendMessage("im not connected");
   }
 }
 
