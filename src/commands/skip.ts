@@ -1,5 +1,6 @@
 import ClientMemory from "../classes/ClientMemory";
 import sendMessage from "../helpers/sendMessage";
+import { QueueObject } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = (args: any) => {
@@ -11,7 +12,7 @@ const execute = (args: any) => {
     if (globalData.queue.length < queueNumber) {
       return sendMessage("The number does not exist in the queue");
     } else {
-      const queueItem: any = globalData.queue.splice(queueNumber - 1, 1);
+      const [queueItem]: QueueObject[] = globalData.queue.splice(queueNumber - 1, 1);
       return sendMessage(`Removed ${queueItem.title} from the queue`);
     }
   }
