@@ -11,8 +11,8 @@ const execute = (args: any) => {
     if (globalData.queue.length < queueNumber) {
       return sendMessage("The number does not exist in the queue");
     } else {
-      const queueItem = globalData.queue.splice(queueNumber - 1, 1);
-      return sendMessage(`Removed ${queueItem} from the queue`);
+      const queueItem: any = globalData.queue.splice(queueNumber - 1, 1);
+      return sendMessage(`Removed ${queueItem.title} from the queue`);
     }
   }
 };
