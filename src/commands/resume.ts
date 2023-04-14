@@ -1,23 +1,20 @@
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
-import clientHandler from "../helpers/clientHandler";
-import sendMessage from "../helpers/sendMessage";
+import { Command } from "../interfaces";
+import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 const globalData = ClientMemory.getInstance();
 
-const execute = () => {
-  if (globalData.isConnectedToVoice) {
-    if (!globalData.paused) {
-      sendMessage("Cannot resume something that is currently playing :(");
-    } else {
-      clientHandler.updatePlaying();
-      globalData.dispatcher.resume();
-      sendMessage(`Resuming`);
-    }
+const execute = async (interaction: CommandInteraction) => {
+  if (globalData.player.state.status === AudioPlayerStatus.Paused) {
+    globalData.player.unpause()
+    entersState(globalData.player, AudioPlayerStatus.Playing, 5000);
+    interaction.reply("Continuing the song!")
   } else {
-    sendMessage("im not connected");
+    interaction.reply("Could not perform this action!");
   }
 };
 
 export default {
+  data: new SlashCommandBuilder().setName("resume").setDescription("Continues from where it was previously paused"),
   execute,
-  alias: ["r", "res"],
-};
+} as Command;

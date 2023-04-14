@@ -1,63 +1,55 @@
 import ClientMemory from "../classes/ClientMemory";
-import ytdl from "ytdl-core-discord";
 import clientHandler from "./clientHandler";
-import stop from "../commands/stop";
-import { Readable } from "stream";
-import { validateURL } from "ytdl-core";
-import sendMessage from "./sendMessage";
 import { QueueObject, VideoObject } from "../interfaces";
-import getVideo from "./getVideoInformation";
+import { Readable } from "stream";
+import { ChannelSearchResult, LiveSearchResult, PlaylistSearchResult, VideoSearchResult } from "yt-search";
+import isValidUrl from "./isValidUrl";
+import ytdl from "ytdl-core";
+import { searchVideo } from "./searchVideo";
+import { AudioPlayerStatus, createAudioResource, entersState, StreamType } from "@discordjs/voice";
 
 const globalData = ClientMemory.getInstance();
 
-const listenOnFinishEvent = () => {
-  if (globalData.dispatcher) {
-    globalData.dispatcher.on("finish", async () => {
-      const nextVideo: QueueObject = clientHandler.getFromQueue();
+const idleHandler = () => {
+  const song: QueueObject = clientHandler.getFromQueue();
 
-      if (!nextVideo) {
-        startDisconnectTimeout();
-      } else {
-        await playVideo(nextVideo);
-      }
-    });
+  if (!song) {
+    globalData.connection.disconnect();
+
+    setTimeout(clientHandler.destroyClient, 0);
+  } else {
+    playSound(null, song);
   }
 };
 
-const startDisconnectTimeout = () => {
-  clientHandler.setDispatcher(null);
-  setTimeout(() => {
-    stop.execute([], null, true);
-  }, 300_000);
-};
+export default async function playSound(searchTerm: string, queueSong?: QueueObject) {
+  let youtubeReadable: Readable;
+  let video: VideoSearchResult | LiveSearchResult | PlaylistSearchResult | ChannelSearchResult;
 
-const playVideo = async (VideoObject: QueueObject | undefined): Promise<any> => {
-  if (!VideoObject) {
-    await sendMessage("No video was found from the given link/title");
-    return null;
-  }
+  if (!queueSong && isValidUrl(searchTerm)) youtubeReadable = ytdl(searchTerm, { filter: "audioonly", highWaterMark: 1 << 25 });
+  else {
+    if (!queueSong) video = await searchVideo(searchTerm);
 
-  try {
-    const youtubeStreamable: Readable = await ytdl(VideoObject.link.toString());
-    clientHandler.setDispatcher(globalData.connection.play(youtubeStreamable, { type: "opus" }));
-    await sendMessage(`Playing: ${VideoObject.title}\nurl: <${VideoObject.link.toString()}>`);
-    listenOnFinishEvent();
-  } catch (e) {
-    await sendMessage("Could not start song...");
-    const VideoObject: QueueObject = clientHandler.getFromQueue();
-
-    if (!VideoObject) {
-      return startDisconnectTimeout();
+    if (queueSong) {
+      youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
     } else {
-      return await playVideo(VideoObject);
+      youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
     }
   }
-};
 
-export const playSound = async (videoObject: QueueObject) => {
-  if (!videoObject) return;
+  const resource = createAudioResource(youtubeReadable, {
+    inputType: StreamType.WebmOpus,
+  });
 
-  console.log(videoObject);
+  globalData.player.play(resource);
 
-  await playVideo(videoObject);
-};
+  entersState(globalData.player, AudioPlayerStatus.Playing, 5000);
+
+  globalData.connection.subscribe(globalData.player);
+
+  globalData.player.on(AudioPlayerStatus.Idle, idleHandler);
+
+  console.log(video);
+
+  return { link: (video && video.url) || searchTerm, title: (video && video.title) || "You only gave me a link" };
+}

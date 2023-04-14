@@ -1,18 +1,12 @@
+import { SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
-import sendMessage from "../helpers/sendMessage";
+import { Command } from "../interfaces";
 import QueueObject from "../interfaces/queue-interface";
 const globalData = ClientMemory.getInstance();
 
-const execute = () => {
-  if (!globalData.isConnectedToVoice) return sendMessage("im not connected");
-  if (!globalData.queue || !globalData.queue.length) return sendMessage("Nothing in the queue!");
-  const queueArray = globalData.queue.map((item: QueueObject, index) => {
-    return `${index + 1} | <${item.link.toString()}> -- ${item.title}`;
-  });
-  return sendMessage(`current queue: \n${queueArray.join("\n")}`);
-};
+const execute = async () => {};
 
 export default {
+  data: new SlashCommandBuilder().setName("queue").setDescription("Shows the current queue"),
   execute,
-  alias: ["q", "que"],
-};
+} as Command;
