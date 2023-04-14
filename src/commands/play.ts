@@ -1,38 +1,56 @@
-import { Message } from "discord.js";
+import { joinVoiceChannel, AudioPlayerStatus } from "@discordjs/voice";
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
 import clientHandler from "../helpers/clientHandler";
-import getVideoInformation from "../helpers/getVideoInformation";
-import { playSound } from "../helpers/playSound";
-import sendMessage from "../helpers/sendMessage";
-import { QueueObject, VideoObject } from "../interfaces";
+import getVoiceChannel from "../helpers/getVoiceChannel";
+import playSound from "../helpers/playSound";
+import { searchVideo } from "../helpers/searchVideo";
+import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
-const execute = async (args: [], msg: Message, userId: string) => {
-  const searchTerm = args.join(" ");
-  if (!searchTerm.length) return;
+const execute = async (interaction: CommandInteraction) => {
+  const searchTerm: any = interaction.options.get("search").value;
 
-  const youtubeVideo: VideoObject = await getVideoInformation(searchTerm);
+  if (!globalData.connection) {
+    // not connected to any voice channel
+    const voiceChannel = getVoiceChannel(interaction);
 
-  if (!youtubeVideo) return;
+    globalData.connection = joinVoiceChannel({
+      channelId: voiceChannel.id,
+      guildId: interaction.guildId,
+      adapterCreator: interaction.guild.voiceAdapterCreator,
+    });
 
-  const queueObject: QueueObject = {
-    type: "video",
-    link: new URL(youtubeVideo.link),
-    title: youtubeVideo.title,
-    userId: userId,
-  };
+    try {
+      const video = await playSound(searchTerm);
+      interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
+    } catch (err) {
+      console.log(err);
+      interaction.reply("Could not play..");
+    }
+  } else {
+    // already connected to a voice channel
 
-  if (globalData.isConnectedToVoice && globalData.dispatcher) {
-    if (!youtubeVideo) return;
-    else sendMessage(`${queueObject.title} added to the queue, it's in position ${globalData.queue.length + 1}`);
-
-    return clientHandler.addToQueue(queueObject);
+    if (globalData.player.state.status === AudioPlayerStatus.Idle) {
+      try {
+        const video = await playSound(searchTerm);
+        interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
+      } catch (err) {
+        console.log(err);
+        interaction.reply("Could not play..");
+      }
+    } else {
+      const video = await searchVideo(searchTerm);
+      clientHandler.addToQueue({ link: video.url, title: video.title });
+      interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
+    }
   }
-  await clientHandler.setupClient(msg);
-  await playSound(queueObject);
 };
 
-exports.default = {
+export default {
+  data: new SlashCommandBuilder()
+    .setName("play")
+    .setDescription("Plays something from youtube")
+    .addStringOption((option) => option.setName("search").setDescription("A link or a search term for youtube").setRequired(true)),
   execute,
-  alias: ["p"],
-};
+} as Command;

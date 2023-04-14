@@ -1,23 +1,20 @@
+import { AudioPlayerStatus, entersState } from "@discordjs/voice";
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
-import clientHandler from "../helpers/clientHandler";
-import sendMessage from "../helpers/sendMessage";
+import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
-const execute = () => {
-  if (globalData.isConnectedToVoice) {
-    if(!globalData.paused) {
-      globalData.dispatcher.pause(); 
-      clientHandler.updatePlaying();
-      sendMessage(`Paused song`);
-    } else {
-      sendMessage("Im already paused")
-    }
+const execute = async (interaction: CommandInteraction) => {
+  if (globalData.player.state.status === AudioPlayerStatus.Playing) {
+    globalData.player.pause();
+    entersState(globalData.player, AudioPlayerStatus.Paused, 5000);
+    interaction.reply("Paused song");
   } else {
-    sendMessage("im not connected");
+    interaction.reply("Could not perform this action!")
   }
-}
-
-exports.default = {
-  execute,
-  alias: ["pa"]
 };
+
+export default {
+  data: new SlashCommandBuilder().setName("pause").setDescription("Pauses the current playing song"),
+  execute,
+} as Command;

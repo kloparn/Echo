@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "noEmit": true,
-    "esModuleInterop": true
-  },
-  "lib": ["es2015"]
+    "target": "es2022",
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node"
+  }
 }

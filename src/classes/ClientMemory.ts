@@ -1,23 +1,21 @@
-import { StreamDispatcher, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
-import queue from "../commands/queue";
+import { Client } from "discord.js";
+import { AudioPlayer, VoiceConnection } from "@discordjs/voice";
 import QueueObject from "../interfaces/queue-interface";
 
 // Global object to keep track of where the bot currently is
 // and what other memory related stuff.
 export default class ClientMemory {
   private static instance: ClientMemory;
-  public voiceChannel: VoiceChannel;
-  public channel: TextChannel;
   public queue: Array<QueueObject>;
-  public isConnectedToVoice: Boolean;
-  public dispatcher: StreamDispatcher;
+  public player: AudioPlayer;
+  public currentVideo: QueueObject;
   public connection: VoiceConnection;
-  public paused: Boolean;
+  public client: Client;
 
   private constructor() {
     this.queue = [];
-    this.isConnectedToVoice = false;
-    this.paused = false;
+    this.client = null;
+    this.player = new AudioPlayer();
   }
 
   public static getInstance(): ClientMemory {
@@ -28,8 +26,13 @@ export default class ClientMemory {
   public static wipeInstance() {
     const memory = ClientMemory.getInstance();
     memory.queue = [];
-    memory.isConnectedToVoice = false;
-    memory.paused = false;
-    memory.dispatcher = null;
+    memory.currentVideo = null;
+    memory.player = new AudioPlayer();
+    memory.connection = null;
+  }
+
+  public static setClient(client: Client) {
+    const memory = ClientMemory.getInstance();
+    memory.client = client;
   }
 }

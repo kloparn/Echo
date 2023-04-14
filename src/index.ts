@@ -1,39 +1,46 @@
 import dotenv from "dotenv";
-import Discord from "discord.js";
-import fs from "fs";
+import { Client, GatewayIntentBits, Events } from "discord.js";
+import initializeCommands from "./helpers/initializeCommands";
+import ClientMemory from "./classes/ClientMemory";
 dotenv.config();
 
-const client = new Discord.Client();
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 
-client.on("ready", () => {
+ClientMemory.setClient(client);
+
+let commandsCollection;
+
+client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+
+  commandsCollection = await initializeCommands();
 });
 
-client.on("message", async (msg: Discord.Message) => {
-  if (!msg.content.startsWith(process.env.PREFIX) || msg.author.bot) return;
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
 
-  // Setup command and args.
-  let args = msg.content.slice(process.env.PREFIX.length).split(/ +/);
-  const userId = msg.author.id
-  const commandName = args.shift().toLowerCase();
+  const commando = commandsCollection.get(interaction.commandName);
 
-  // First it tries to find a file with the command given
+  if (!commando) {
+    console.error(`No command matching ${interaction.commandName} was found.`);
+    return;
+  }
+
   try {
-    const { default: command } = require(`./commands/${commandName}.js`);
-    command.execute(args, msg, userId);
-  } catch (_) /* no command found */ {
-    // Getting all avaiable commands to search if the given command is a alias
-    const files: string[] = await fs.promises.readdir("./dist/commands");
-
-    for (const file of files) {
-      const { default: command } = require(`./commands/${file}`);
-      if (command.alias.includes(commandName)) {
-        command.execute(args, msg, userId);
-        return;
-      }
+    await commando.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    } else {
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
     }
-
-    return msg.channel.send(`Sorry did not recognize the command *${commandName}*`);
   }
 });
 
