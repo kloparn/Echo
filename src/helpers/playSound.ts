@@ -19,7 +19,12 @@ const idleHandler = () => {
     setTimeout(clientHandler.destroyClient, 0);
   } else {
     globalData.playingInteraction.editReply(`Playing: ${song.title}\nLink: <${song.link}>`);
-    playSound(null, song);
+    try {
+      playSound(null, song);
+    } catch (err) {
+      console.log(err);
+      idleHandler();
+    }
   }
 };
 
