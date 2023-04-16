@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, CommandInteraction } from "discord.js";
 import { AudioPlayer, VoiceConnection } from "@discordjs/voice";
 import QueueObject from "../interfaces/queue-interface";
 
@@ -11,6 +11,7 @@ export default class ClientMemory {
   public currentVideo: QueueObject;
   public connection: VoiceConnection;
   public client: Client;
+  public playingInteraction: CommandInteraction;
 
   private constructor() {
     this.queue = [];

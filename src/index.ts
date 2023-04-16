@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import initializeCommands from "./helpers/initializeCommands";
 import ClientMemory from "./classes/ClientMemory";
+import { deleteReply } from "./helpers/messageHelper";
 dotenv.config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
@@ -28,6 +29,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   try {
     await commando.execute(interaction);
+    if (interaction.commandName !== "play") {
+      deleteReply(interaction, 5_000);
+    }
   } catch (error) {
     console.error(error);
     if (interaction.replied || interaction.deferred) {

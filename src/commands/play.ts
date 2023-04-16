@@ -3,6 +3,7 @@ import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
 import clientHandler from "../helpers/clientHandler";
 import getVoiceChannel from "../helpers/getVoiceChannel";
+import { deleteReply } from "../helpers/messageHelper";
 import playSound from "../helpers/playSound";
 import { searchVideo } from "../helpers/searchVideo";
 import { Command } from "../interfaces";
@@ -23,7 +24,8 @@ const execute = async (interaction: CommandInteraction) => {
 
     try {
       const video = await playSound(searchTerm);
-      interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
+      const successResponse = interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
+      if (successResponse) globalData.playingInteraction = interaction;
     } catch (err) {
       console.log(err);
       interaction.reply("Could not play..");
@@ -31,19 +33,10 @@ const execute = async (interaction: CommandInteraction) => {
   } else {
     // already connected to a voice channel
 
-    if (globalData.player.state.status === AudioPlayerStatus.Idle) {
-      try {
-        const video = await playSound(searchTerm);
-        interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
-      } catch (err) {
-        console.log(err);
-        interaction.reply("Could not play..");
-      }
-    } else {
-      const video = await searchVideo(searchTerm);
-      clientHandler.addToQueue({ link: video.url, title: video.title });
-      interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
-    }
+    const video = await searchVideo(searchTerm);
+    clientHandler.addToQueue({ link: video.url, title: video.title });
+    interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
+    deleteReply(interaction, 5_000);
   }
 };
 

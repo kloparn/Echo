@@ -8,6 +8,4 @@ const searchVideo = async (searchTerm: string) => {
   return videos[0];
 };
 
-export {
-  searchVideo,
-};
+export { searchVideo };
