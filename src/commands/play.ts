@@ -36,7 +36,8 @@ const execute = async (interaction: CommandInteraction) => {
     const video = await searchVideo(searchTerm);
     clientHandler.addToQueue({ link: video.url, title: video.title });
     interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
-    deleteReply(interaction, 5_000);
+
+    deleteReply(interaction, 10_000);
   }
 };
 

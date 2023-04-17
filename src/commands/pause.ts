@@ -7,7 +7,7 @@ const globalData = ClientMemory.getInstance();
 const execute = async (interaction: CommandInteraction) => {
   if (globalData.player.state.status === AudioPlayerStatus.Playing) {
     globalData.player.pause();
-    entersState(globalData.player, AudioPlayerStatus.Paused, 5000);
+    await entersState(globalData.player, AudioPlayerStatus.Paused, 5000);
     interaction.reply("Paused song");
   } else {
     interaction.reply("Could not perform this action!")

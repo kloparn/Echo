@@ -7,10 +7,11 @@ import isValidUrl from "./isValidUrl";
 import ytdl from "ytdl-core";
 import { searchVideo } from "./searchVideo";
 import { AudioPlayerStatus, createAudioResource, entersState, StreamType } from "@discordjs/voice";
+import { format } from "path";
 
 const globalData = ClientMemory.getInstance();
 
-const idleHandler = () => {
+const idleHandler = async () => {
   const song: QueueObject = clientHandler.getFromQueue();
 
   if (!song) {
@@ -20,7 +21,7 @@ const idleHandler = () => {
   } else {
     globalData.playingInteraction.editReply(`Playing: ${song.title}\nLink: <${song.link}>`);
     try {
-      playSound(null, song);
+      await playSound(null, song);
     } catch (err) {
       console.log(err);
       idleHandler();
@@ -43,19 +44,21 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
     }
   }
 
+  // ytdl.chooseFormat(youtubeReadable, { format: (format) => format.contentLength})
+
+  console.log(youtubeReadable);
+
   const resource = createAudioResource(youtubeReadable, {
     inputType: StreamType.WebmOpus,
   });
 
   globalData.player.play(resource);
 
-  entersState(globalData.player, AudioPlayerStatus.Playing, 5000);
+  await entersState(globalData.player, AudioPlayerStatus.Playing, 5000);
 
   globalData.connection.subscribe(globalData.player);
 
   globalData.player.on(AudioPlayerStatus.Idle, idleHandler);
-
-  console.log(video);
 
   return { link: (video && video.url) || searchTerm, title: (video && video.title) || "You only gave me a link" };
 }
