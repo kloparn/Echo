@@ -7,7 +7,6 @@ import isValidUrl from "./isValidUrl";
 import ytdl from "ytdl-core";
 import { searchVideo } from "./searchVideo";
 import { AudioPlayerStatus, createAudioResource, entersState, StreamType } from "@discordjs/voice";
-import { format } from "path";
 
 const globalData = ClientMemory.getInstance();
 
@@ -19,12 +18,12 @@ const idleHandler = async () => {
 
     setTimeout(clientHandler.destroyClient, 0);
   } else {
-    globalData.playingInteraction.editReply(`Playing: ${song.title}\nLink: <${song.link}>`);
+    await globalData.playingInteraction.editReply(`Playing: ${song.title}\nLink: <${song.link}>`);
     try {
       await playSound(null, song);
     } catch (err) {
       console.log(err);
-      idleHandler();
+      await idleHandler();
     }
   }
 };
@@ -33,20 +32,14 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
   let youtubeReadable: Readable;
   let video: VideoSearchResult | LiveSearchResult | PlaylistSearchResult | ChannelSearchResult;
 
-  if (!queueSong && isValidUrl(searchTerm)) youtubeReadable = ytdl(searchTerm, { filter: "audioonly", highWaterMark: 1 << 25 });
-  else {
-    if (!queueSong) video = await searchVideo(searchTerm);
-
-    if (queueSong) {
-      youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
-    } else {
-      youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
-    }
+  if (queueSong) {
+    youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
+  } else if (isValidUrl(searchTerm)) {
+    youtubeReadable = ytdl(searchTerm, { filter: "audioonly", highWaterMark: 1 << 25 });
+  } else {
+    video = await searchVideo(searchTerm);
+    youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
   }
-
-  // ytdl.chooseFormat(youtubeReadable, { format: (format) => format.contentLength})
-
-  console.log(youtubeReadable);
 
   const resource = createAudioResource(youtubeReadable, {
     inputType: StreamType.WebmOpus,
@@ -58,7 +51,12 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
 
   globalData.connection.subscribe(globalData.player);
 
-  globalData.player.on(AudioPlayerStatus.Idle, idleHandler);
+  // we do not want to add multiple eventlisteners for "idle" status, so we do a simple check.
+
+  if (globalData.idleHandlerStatus === "inactive") {
+    globalData.idleHandlerStatus = "active";
+    globalData.player.on(AudioPlayerStatus.Idle, idleHandler);
+  }
 
   return { link: (video && video.url) || searchTerm, title: (video && video.title) || "You only gave me a link" };
 }

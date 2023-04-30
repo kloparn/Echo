@@ -1,7 +1,6 @@
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
 import { Command } from "../interfaces";
-import QueueObject from "../interfaces/queue-interface";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
@@ -10,7 +9,7 @@ const execute = async (interaction: CommandInteraction) => {
     return str;
   }, "");
 
-  interaction.reply(queueString);
+  interaction.reply(!queueString.length ? "Nothing in queue" : queueString);
 };
 
 export default {

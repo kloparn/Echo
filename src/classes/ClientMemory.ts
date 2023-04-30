@@ -12,11 +12,13 @@ export default class ClientMemory {
   public connection: VoiceConnection;
   public client: Client;
   public playingInteraction: CommandInteraction;
+  public idleHandlerStatus: String;
 
   private constructor() {
     this.queue = [];
     this.client = null;
     this.player = new AudioPlayer();
+    this.idleHandlerStatus = "inactive";
   }
 
   public static getInstance(): ClientMemory {
@@ -30,6 +32,7 @@ export default class ClientMemory {
     memory.currentVideo = null;
     memory.player = new AudioPlayer();
     memory.connection = null;
+    memory.idleHandlerStatus = "inactive";
   }
 
   public static setClient(client: Client) {

@@ -33,7 +33,8 @@ const execute = async (interaction: CommandInteraction) => {
   } else {
     // already connected to a voice channel
 
-    const video = await searchVideo(searchTerm);
+    const video = await Promise.resolve(searchVideo(searchTerm));
+
     clientHandler.addToQueue({ link: video.url, title: video.title });
     interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
 

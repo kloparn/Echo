@@ -6,7 +6,7 @@ const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
   if (globalData.player.state.status === AudioPlayerStatus.Playing) {
-    const position = interaction.options.get("position").value;
+    const position = interaction.options.get("position")?.value;
 
     if (!position) {
       globalData.player.stop();
