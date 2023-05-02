@@ -7,6 +7,7 @@ import isValidUrl from "./isValidUrl";
 import ytdl from "ytdl-core";
 import { searchVideo } from "./searchVideo";
 import { AudioPlayerStatus, createAudioResource, entersState, StreamType } from "@discordjs/voice";
+import getValidVideoUrl from "./getValidVideoUrl";
 
 const globalData = ClientMemory.getInstance();
 
@@ -16,6 +17,7 @@ const idleHandler = async () => {
   if (!song) {
     globalData.connection.disconnect();
 
+    // we want the player to have a chance to disconnect from the voice channel before destroying the client.
     setTimeout(clientHandler.destroyClient, 0);
   } else {
     await globalData.playingInteraction.editReply(`Playing: ${song.title}\nLink: <${song.link}>`);
@@ -35,7 +37,7 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
   if (queueSong) {
     youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
   } else if (isValidUrl(searchTerm)) {
-    youtubeReadable = ytdl(searchTerm, { filter: "audioonly", highWaterMark: 1 << 25 });
+    youtubeReadable = ytdl(getValidVideoUrl(searchTerm), { filter: "audioonly", highWaterMark: 1 << 25 });
   } else {
     video = await searchVideo(searchTerm);
     youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
