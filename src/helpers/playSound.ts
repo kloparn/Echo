@@ -7,7 +7,6 @@ import isValidUrl from "./isValidUrl";
 import ytdl from "ytdl-core";
 import { searchVideo } from "./searchVideo";
 import { AudioPlayerStatus, createAudioResource, entersState, StreamType } from "@discordjs/voice";
-import getValidVideoUrl from "./getValidVideoUrl";
 
 const globalData = ClientMemory.getInstance();
 
@@ -37,7 +36,7 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
   if (queueSong) {
     youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
   } else if (isValidUrl(searchTerm)) {
-    youtubeReadable = ytdl(getValidVideoUrl(searchTerm), { filter: "audioonly", highWaterMark: 1 << 25 });
+    youtubeReadable = ytdl(searchTerm, { filter: "audioonly", highWaterMark: 1 << 25 });
   } else {
     video = await searchVideo(searchTerm);
     youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
