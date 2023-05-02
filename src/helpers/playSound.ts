@@ -36,8 +36,12 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
 
   if (queueSong) {
     youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
-  } else if (isValidUrl(searchTerm)) {
-    youtubeReadable = ytdl(getValidVideoUrl(searchTerm), { filter: "audioonly", highWaterMark: 1 << 25 });
+  } else if (isValidUrl(searchTerm) && ytdl.validateURL(searchTerm)) {
+
+    // we clean the searchTerm as it's a youtube link.
+    searchTerm = getValidVideoUrl(searchTerm);
+
+    youtubeReadable = ytdl(searchTerm, { filter: "audioonly", highWaterMark: 1 << 25 });
   } else {
     video = await searchVideo(searchTerm);
     youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
