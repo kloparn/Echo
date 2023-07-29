@@ -6,10 +6,11 @@ import { ChannelSearchResult, LiveSearchResult, PlaylistSearchResult, VideoSearc
 import isValidUrl from "./isValidUrl";
 import ytdl from "ytdl-core";
 import { searchVideo } from "./searchVideo";
-import { AudioPlayerStatus, createAudioResource, entersState, StreamType } from "@discordjs/voice";
+import { AudioPlayerStatus, createAudioResource, PlayerSubscription } from "@discordjs/voice";
 import getValidVideoUrl from "./getValidVideoUrl";
 
 const globalData = ClientMemory.getInstance();
+let createdSubscription: PlayerSubscription;
 
 const idleHandler = async () => {
   const song: QueueObject = clientHandler.getFromQueue();
@@ -25,7 +26,12 @@ const idleHandler = async () => {
       await playSound(null, song);
     } catch (err) {
       console.log(err);
-      await idleHandler();
+      await globalData.playingInteraction.editReply(`Something happened to the song: ${song.title}`);
+      setTimeout(async () => {
+        if (globalData?.connection?.disconnect) {
+          await idleHandler();
+        }
+      }, 200);
     }
   }
 };
@@ -37,7 +43,6 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
   if (queueSong) {
     youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
   } else if (isValidUrl(searchTerm) && ytdl.validateURL(searchTerm)) {
-
     // we clean the searchTerm as it's a youtube link.
     searchTerm = getValidVideoUrl(searchTerm);
 
@@ -47,21 +52,24 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
     youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
   }
 
-  const resource = createAudioResource(youtubeReadable, {
-    inputType: StreamType.WebmOpus,
-  });
-
-  globalData.player.play(resource);
-
-  await entersState(globalData.player, AudioPlayerStatus.Playing, 5000);
-
-  globalData.connection.subscribe(globalData.player);
+  const resource = createAudioResource(youtubeReadable);
 
   // we do not want to add multiple eventlisteners for "idle" status, so we do a simple check.
 
   if (globalData.idleHandlerStatus === "inactive") {
     globalData.idleHandlerStatus = "active";
     globalData.player.on(AudioPlayerStatus.Idle, idleHandler);
+  }
+
+  // Something is wrong with trying to play the audio if the video does not have a webm result!
+
+  try {
+    globalData.player.play(resource);
+    globalData.connection.subscribe(globalData.player);
+  } catch (e) {
+    console.log(e);
+    await idleHandler();
+    globalData.playingInteraction.reply(`Could not play: ${video.title || "__no title given__"} `);
   }
 
   return { link: (video && video.url) || searchTerm, title: (video && video.title) || "You only gave me a link" };
