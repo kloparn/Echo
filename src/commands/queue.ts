@@ -9,7 +9,7 @@ const execute = async (interaction: CommandInteraction) => {
     return str;
   }, "");
 
-  interaction.reply(!queueString.length ? "Nothing in queue" : queueString);
+  await interaction.reply(!queueString.length ? "Nothing in queue" : queueString);
 };
 
 export default {

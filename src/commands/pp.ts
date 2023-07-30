@@ -5,7 +5,7 @@ import { Command, VideoObject } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  interaction.reply("Sorry not done yet");
+  await interaction.reply("Sorry not done yet");
 };
 
 export default {

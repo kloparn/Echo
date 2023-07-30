@@ -69,7 +69,7 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
   } catch (e) {
     console.log(e);
     await idleHandler();
-    globalData.playingInteraction.reply(`Could not play: ${video.title || "__no title given__"} `);
+    await globalData.playingInteraction.reply(`Could not play: ${video.title || "__no title given__"} `);
   }
 
   return { link: (video && video.url) || searchTerm, title: (video && video.title) || "You only gave me a link" };

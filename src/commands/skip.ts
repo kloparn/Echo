@@ -12,14 +12,14 @@ const execute = async (interaction: CommandInteraction) => {
       globalData.player.stop();
       await entersState(globalData.player, AudioPlayerStatus.Idle, 5000);
 
-      interaction.reply("Skipped current song...");
+      await interaction.reply("Skipped current song...");
     } else {
       const song = globalData.queue.splice((position as number) - 1, 1)[0];
 
-      interaction.reply(`Removed /${song.title} from queue!`);
+      await interaction.reply(`Removed /${song.title} from queue!`);
     }
   } else {
-    interaction.reply("Could not perform this action!");
+    await interaction.reply("Could not perform this action!");
   }
 };
 

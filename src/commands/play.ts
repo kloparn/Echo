@@ -24,11 +24,11 @@ const execute = async (interaction: CommandInteraction) => {
 
     try {
       const video = await playSound(searchTerm);
-      const successResponse = interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
+      const successResponse = await interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
       if (successResponse) globalData.playingInteraction = interaction;
     } catch (err) {
       console.log(err);
-      interaction.reply("Could not play..");
+      await interaction.reply("Could not play..");
     }
   } else {
     // already connected to a voice channel
@@ -36,7 +36,7 @@ const execute = async (interaction: CommandInteraction) => {
     const video = await Promise.resolve(searchVideo(searchTerm));
 
     clientHandler.addToQueue({ link: video.url, title: video.title });
-    interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
+    await interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
 
     deleteReply(interaction, 10_000);
   }

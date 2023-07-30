@@ -9,7 +9,7 @@ const execute = async (interaction: CommandInteraction) => {
     globalData.player.stop();
     if (globalData.connection.disconnect()) {
       clientHandler.destroyClient();
-      interaction.reply("Stopping the player...");
+      await interaction.reply("Stopping the player...");
     }
   }
 };
