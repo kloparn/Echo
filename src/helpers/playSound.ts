@@ -1,16 +1,27 @@
 import ClientMemory from "../classes/ClientMemory";
 import clientHandler from "./clientHandler";
 import { QueueObject, VideoObject } from "../interfaces";
-import { Readable } from "stream";
-import { ChannelSearchResult, LiveSearchResult, PlaylistSearchResult, VideoSearchResult } from "yt-search";
 import isValidUrl from "./isValidUrl";
 import ytdl from "ytdl-core";
 import { searchVideo } from "./searchVideo";
-import { AudioPlayerStatus, createAudioResource, PlayerSubscription } from "@discordjs/voice";
+import { AudioPlayerStatus, AudioResource, createAudioResource } from "@discordjs/voice";
 import getValidVideoUrl from "./getValidVideoUrl";
 
 const globalData = ClientMemory.getInstance();
-let createdSubscription: PlayerSubscription;
+
+const getVideo = async (link) => {
+  if (isValidUrl(link) && ytdl.validateURL(link)) {
+    link = getValidVideoUrl(link);
+  }
+
+  const video = await searchVideo(link);
+
+  return video;
+};
+
+const getYoutubeReadable = (link: string) => {
+  return ytdl(link, { filter: "audioonly", highWaterMark: 1 << 25 });
+};
 
 const idleHandler = async () => {
   const song: QueueObject = clientHandler.getFromQueue();
@@ -21,12 +32,14 @@ const idleHandler = async () => {
     // we want the player to have a chance to disconnect from the voice channel before destroying the client.
     setTimeout(clientHandler.destroyClient, 0);
   } else {
-    await globalData.playingInteraction.editReply(`Playing: ${song.title}\nLink: <${song.link}>`);
     try {
-      await playSound(null, song);
+      const youtubeReadable = getYoutubeReadable(song.link);
+      const resource = createAudioResource(youtubeReadable);
+      const interactionReplyString = await playAudio({ link: song.link, title: song.title }, resource);
+      await globalData.playingInteraction.editReply(interactionReplyString);
     } catch (err) {
       console.log(err);
-      await globalData.playingInteraction.editReply(`Something happened to the song: ${song.title}`);
+      await globalData.playingInteraction.editReply("Something wrong with the next song");
       setTimeout(async () => {
         if (globalData?.connection?.disconnect) {
           await idleHandler();
@@ -36,21 +49,22 @@ const idleHandler = async () => {
   }
 };
 
-export default async function playSound(searchTerm: string, queueSong?: QueueObject) {
-  let youtubeReadable: Readable;
-  let video: VideoSearchResult | LiveSearchResult | PlaylistSearchResult | ChannelSearchResult;
-
-  if (queueSong) {
-    youtubeReadable = ytdl(queueSong.link, { filter: "audioonly", highWaterMark: 1 << 25 });
-  } else if (isValidUrl(searchTerm) && ytdl.validateURL(searchTerm)) {
-    // we clean the searchTerm as it's a youtube link.
-    searchTerm = getValidVideoUrl(searchTerm);
-
-    youtubeReadable = ytdl(searchTerm, { filter: "audioonly", highWaterMark: 1 << 25 });
-  } else {
-    video = await searchVideo(searchTerm);
-    youtubeReadable = ytdl(video.url, { filter: "audioonly", highWaterMark: 1 << 25 });
+const playAudio = async (video: VideoObject, resource: AudioResource<null>) => {
+  try {
+    globalData.player.play(resource);
+    globalData.connection.subscribe(globalData.player);
+  } catch (e) {
+    console.log(e);
+    await globalData.playingInteraction.reply(`Could not play: ${video.title || "__no title given__"} `);
+    throw new Error("Could not play the song as the player would not subscribe");
   }
+
+  return `Playing: ${video && video.title}\nLink: <${(video && video.link) || "No link specified"}>`;
+};
+
+export default async function playSound(searchTerm: string) {
+  const video = await getVideo(searchTerm);
+  const youtubeReadable = getYoutubeReadable(video.link);
 
   const resource = createAudioResource(youtubeReadable);
 
@@ -61,16 +75,5 @@ export default async function playSound(searchTerm: string, queueSong?: QueueObj
     globalData.player.on(AudioPlayerStatus.Idle, idleHandler);
   }
 
-  // Something is wrong with trying to play the audio if the video does not have a webm result!
-
-  try {
-    globalData.player.play(resource);
-    globalData.connection.subscribe(globalData.player);
-  } catch (e) {
-    console.log(e);
-    await idleHandler();
-    await globalData.playingInteraction.reply(`Could not play: ${video.title || "__no title given__"} `);
-  }
-
-  return { link: (video && video.url) || searchTerm, title: (video && video.title) || "You only gave me a link" };
+  return await playAudio(video, resource);
 }

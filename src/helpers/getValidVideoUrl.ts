@@ -1,4 +1,4 @@
-export default (url) => {
+export default (url: string) => {
   const u = new URL(url);
 
   if (!u.searchParams.get("v")) return url;

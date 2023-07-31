@@ -6,7 +6,7 @@ import getVoiceChannel from "../helpers/getVoiceChannel";
 import { deleteReply } from "../helpers/messageHelper";
 import playSound from "../helpers/playSound";
 import { searchVideo } from "../helpers/searchVideo";
-import { Command } from "../interfaces";
+import { Command, VideoObject } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
@@ -23,8 +23,8 @@ const execute = async (interaction: CommandInteraction) => {
     });
 
     try {
-      const video = await playSound(searchTerm);
-      const successResponse = await interaction.reply(`Playing: ${video.title}\nLink: <${video.link}>`);
+      const interactionReplyString = await playSound(searchTerm);
+      const successResponse = await interaction.reply(interactionReplyString);
       if (successResponse) globalData.playingInteraction = interaction;
     } catch (err) {
       console.log(err);
@@ -33,9 +33,10 @@ const execute = async (interaction: CommandInteraction) => {
   } else {
     // already connected to a voice channel
 
-    const video = await Promise.resolve(searchVideo(searchTerm));
+    const video: VideoObject = await searchVideo(searchTerm);
 
-    clientHandler.addToQueue({ link: video.url, title: video.title });
+    clientHandler.addToQueue({ link: video.link, title: video.title });
+
     await interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
 
     deleteReply(interaction, 10_000);

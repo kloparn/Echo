@@ -1,4 +1,4 @@
-import { CommandInteraction, GuildMember } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
 const globalData = ClientMemory.getInstance();
 

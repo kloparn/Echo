@@ -13,8 +13,6 @@ export default async () => {
     commandsCollection.set(command.data.name, command);
   }
 
-  // commandsCollection.set(Play.data.name, Play);
-
   await updateCommandsWithDiscordAPI(commandsCollection);
 
   return commandsCollection;
@@ -25,7 +23,7 @@ const updateCommandsWithDiscordAPI = async (commands: Collection<String, Command
 
   commands.forEach((command) => commandsJson.push(command.data.toJSON()));
 
-  const rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
+  const rest = new REST().setToken(process.env.TOKEN!);
 
   try {
     // The put method is used to fully refresh all commands in the guild with the current set

@@ -1,7 +1,7 @@
 import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
-import { Command, QueueObject } from "../interfaces";
+import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
@@ -10,13 +10,12 @@ const execute = async (interaction: CommandInteraction) => {
 
     if (!position) {
       globalData.player.stop();
-      await entersState(globalData.player, AudioPlayerStatus.Idle, 5000);
 
       await interaction.reply("Skipped current song...");
     } else {
-      const song = globalData.queue.splice((position as number) - 1, 1)[0];
+      const queueObject = globalData.queue.splice((position as number) - 1, 1)[0];
 
-      await interaction.reply(`Removed /${song.title} from queue!`);
+      await interaction.reply(`Removed ${queueObject.title} from queue!`);
     }
   } else {
     await interaction.reply("Could not perform this action!");
