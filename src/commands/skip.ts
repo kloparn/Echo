@@ -1,6 +1,7 @@
 import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
+import buildEmbed from "../helpers/buildEmbed";
 import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
@@ -14,6 +15,8 @@ const execute = async (interaction: CommandInteraction) => {
       await interaction.reply("Skipped current song...");
     } else {
       const video = globalData.queue.splice((position as number) - 1, 1)[0];
+
+      globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)]})
 
       await interaction.reply(`Removed ${video.title} from queue!`);
     }
