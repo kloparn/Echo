@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { Client, GatewayIntentBits, Events } from "discord.js";
+import { Client, GatewayIntentBits, Events, CommandInteraction, CacheType } from "discord.js";
 import initializeCommands from "./helpers/initializeCommands";
 import ClientMemory from "./classes/ClientMemory";
 import { deleteReply } from "./helpers/messageHelper";
@@ -17,8 +17,8 @@ client.on("ready", async () => {
   commandsCollection = await initializeCommands();
 });
 
-client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand() && interaction.guildId === process.env.GUILD_ID) return;
+client.on(Events.InteractionCreate, async (interaction: any) => {
+  if (!interaction.isChatInputCommand()) return;
 
   const commando = commandsCollection.get(interaction.commandName);
 
