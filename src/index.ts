@@ -18,7 +18,7 @@ client.on("ready", async () => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+  if (!interaction.isChatInputCommand() && interaction.guildId === process.env.GUILD_ID) return;
 
   const commando = commandsCollection.get(interaction.commandName);
 
