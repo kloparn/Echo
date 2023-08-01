@@ -1,6 +1,5 @@
 import { spawn } from "child_process";
-import yts, { SearchResult } from "yt-search";
-import { VideoObject } from "../interfaces";
+import yts, { SearchResult, VideoSearchResult } from "yt-search";
 import getValidVideoUrl from "./getValidVideoUrl";
 import isValidUrl from "./isValidUrl";
 import { testRestrictedVideo } from "./testRestrictedVideo";
@@ -28,12 +27,12 @@ const searchVideo = async (searchTerm: string) => {
   });
 
   try {
-    await testRestrictedVideo({ title: video.title, link: video.url });
+    await testRestrictedVideo(video);
   } catch (e) {
     throw new Error("Video is restricted, cannot play");
   }
 
-  return { title: video.title, link: video.url } as VideoObject;
+  return video as VideoSearchResult;
 };
 
 export { searchVideo };

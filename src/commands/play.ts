@@ -1,12 +1,13 @@
 import { joinVoiceChannel, AudioPlayerStatus } from "@discordjs/voice";
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
+import buildEmbed from "../helpers/buildEmbed";
 import clientHandler from "../helpers/clientHandler";
 import getVoiceChannel from "../helpers/getVoiceChannel";
 import { deleteReply } from "../helpers/messageHelper";
 import playSound from "../helpers/playSound";
 import { searchVideo } from "../helpers/searchVideo";
-import { Command, VideoObject } from "../interfaces";
+import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
@@ -23,11 +24,18 @@ const execute = async (interaction: CommandInteraction) => {
     });
 
     try {
-      const interactionReplyString = await playSound(searchTerm);
-      const successResponse = await interaction.reply(interactionReplyString);
-      if (successResponse) globalData.playingInteraction = interaction;
+      const video = await playSound(searchTerm);
+      const successResponse = await interaction.reply("Started echo");
+
+      // globalData.playerEmbed = await interaction.channel.send(new )
+
+      const playerEmbed = await interaction.channel.send({ embeds: [buildEmbed(video, globalData.queue)] });
+
+      if (successResponse) {
+        globalData.currentVideo = video;
+        globalData.playerEmbed = playerEmbed;
+      }
     } catch (err) {
-      console.log(err);
       await interaction.reply("Video is restricted, cannot play, leaving the channel.");
       globalData.connection.disconnect();
 
@@ -39,14 +47,16 @@ const execute = async (interaction: CommandInteraction) => {
 
     try {
       const video = await searchVideo(searchTerm);
-      clientHandler.addToQueue({ link: video.link, title: video.title });
+      clientHandler.addToQueue(video);
+
+      globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)] });
 
       await interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
     } catch (e) {
       await interaction.reply("Video is restricted, cannot play");
     }
 
-    deleteReply(interaction, 10_000);
+    // deleteReply(interaction, 10_000);
   }
 };
 

@@ -13,9 +13,9 @@ const execute = async (interaction: CommandInteraction) => {
 
       await interaction.reply("Skipped current song...");
     } else {
-      const queueObject = globalData.queue.splice((position as number) - 1, 1)[0];
+      const video = globalData.queue.splice((position as number) - 1, 1)[0];
 
-      await interaction.reply(`Removed ${queueObject.title} from queue!`);
+      await interaction.reply(`Removed ${video.title} from queue!`);
     }
   } else {
     await interaction.reply("Could not perform this action!");

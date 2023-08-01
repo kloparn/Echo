@@ -1,6 +1,6 @@
 import { CommandInteraction, SlashCommandBuilder, User } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
-import { Command, VideoObject } from "../interfaces";
+import { Command } from "../interfaces";
 
 const globalData = ClientMemory.getInstance();
 

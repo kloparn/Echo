@@ -1,17 +1,17 @@
-import { Client, CommandInteraction } from "discord.js";
+import { Client, CommandInteraction, Message } from "discord.js";
 import { AudioPlayer, VoiceConnection } from "@discordjs/voice";
-import QueueObject from "../interfaces/queue-interface";
+import { VideoSearchResult } from "yt-search";
 
 // Global object to keep track of where the bot currently is
 // and what other memory related stuff.
 export default class ClientMemory {
   private static instance: ClientMemory;
-  public queue: Array<QueueObject>;
+  public queue: Array<VideoSearchResult>;
   public player: AudioPlayer;
-  public currentVideo: QueueObject;
+  public currentVideo: VideoSearchResult;
   public connection: VoiceConnection;
   public client: Client;
-  public playingInteraction: CommandInteraction;
+  public playerEmbed: Message;
   public idleHandlerStatus: String;
 
   private constructor() {

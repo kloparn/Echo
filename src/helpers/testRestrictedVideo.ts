@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
+import { VideoSearchResult } from "yt-search";
 import ytdl from "ytdl-core";
-import { VideoObject } from "../interfaces";
 
 if (process.argv[2] === "checkVideoChild") {
   ytdl.getInfo(JSON.parse(process.argv[3])).then((value) => {
@@ -12,9 +12,9 @@ if (process.argv[2] === "checkVideoChild") {
 // the entire application will crash, in-order to avoid that we test getting the video information
 // in a different process all together then return the result if it can be played.
 
-const testRestrictedVideo = async (video: VideoObject) => {
+const testRestrictedVideo = async (video: VideoSearchResult) => {
   const canPlayVideo = await new Promise((res, rej) => {
-    const worker = spawn(process.execPath, [__filename, "checkVideoChild", JSON.stringify(video.link)]);
+    const worker = spawn(process.execPath, [__filename, "checkVideoChild", JSON.stringify(video.url)]);
 
     worker.stdout.on("data", (data) => {
       res(true);

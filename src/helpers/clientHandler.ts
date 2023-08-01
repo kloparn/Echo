@@ -1,12 +1,11 @@
-import { Message, TextChannel } from "discord.js";
+import { VideoSearchResult } from "yt-search";
 import ClientMemory from "../classes/ClientMemory";
-import { QueueObject } from "../interfaces";
 
 const globalData = ClientMemory.getInstance();
 
-const addToQueue = (queueItem: QueueObject) => globalData.queue.push(queueItem);
+const addToQueue = (it: VideoSearchResult) => globalData.queue.push(it);
 
-const getFromQueue = (): QueueObject => globalData.queue.shift();
+const getFromQueue = (): VideoSearchResult => globalData.queue.shift();
 
 const destroyClient = () => {
   ClientMemory.wipeInstance();
