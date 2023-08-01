@@ -49,7 +49,7 @@ const execute = async (interaction: CommandInteraction) => {
       const video = await searchVideo(searchTerm);
       clientHandler.addToQueue(video);
 
-      globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)] });
+      await globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)] });
 
       await interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
     } catch (e) {

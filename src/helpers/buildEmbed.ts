@@ -21,7 +21,7 @@ export default (video: VideoSearchResult, queue: Array<VideoSearchResult>) => {
     .setTitle(`Playing: ${video.title}`)
     .setURL(video.url)
     .setAuthor({ name: "Echo music player" })
-    .setThumbnail(video.thumbnail)
+    .setThumbnail(video?.thumbnail)
     .addFields(...queueFields)
     .setTimestamp()
     .setFooter({ text: `echo` });

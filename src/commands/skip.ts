@@ -16,7 +16,7 @@ const execute = async (interaction: CommandInteraction) => {
     } else {
       const video = globalData.queue.splice((position as number) - 1, 1)[0];
 
-      globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)]})
+      await globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)]})
 
       await interaction.reply(`Removed ${video.title} from queue!`);
     }
