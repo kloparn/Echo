@@ -28,6 +28,7 @@ const idleHandler = async () => {
   const song = clientHandler.getFromQueue();
 
   if (!song) {
+    await globalData.playerEmbed.delete();
     globalData.connection.disconnect();
 
     // we want the player to have a chance to disconnect from the voice channel before destroying the client.
