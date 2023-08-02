@@ -15,14 +15,14 @@ const execute = async (interaction: CommandInteraction) => {
 
   const messages = await messageManager.fetch({ limit: 100 });
 
+  messages.filter((m) => m.author.bot)
+
   let counter = 0;
 
   for (const [, msg] of messages) {
-    if (msg.author.id === botId) {
-      if (msg.deletable) {
-        await msg.delete();
-        counter++;
-      }
+    if (msg.deletable) {
+      await msg.delete();
+      counter++;
     }
   }
 
