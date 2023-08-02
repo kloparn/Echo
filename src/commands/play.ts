@@ -30,8 +30,6 @@ const execute = async (interaction: CommandInteraction) => {
 
       await interaction.editReply("Started echo");
 
-      deleteReply(interaction, 2_000);
-
       if (playerEmbed) {
         globalData.currentVideo = video;
         globalData.playerEmbed = playerEmbed;
@@ -44,6 +42,8 @@ const execute = async (interaction: CommandInteraction) => {
       if (left) {
         clientHandler.destroyClient();
       }
+
+      deleteReply(interaction, 2_000);
     }
   } else {
     // already connected to a voice channel
