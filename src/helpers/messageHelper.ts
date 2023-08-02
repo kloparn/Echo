@@ -1,6 +1,4 @@
-import { CommandInteraction } from "discord.js";
-
-const deleteReply = (interaction: CommandInteraction, timeBeforeDeletion: number) => {
+const deleteReply = (interaction: any, timeBeforeDeletion: number) => {
   setTimeout(async () => {
     await interaction.deleteReply();
   }, timeBeforeDeletion);

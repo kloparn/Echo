@@ -3,6 +3,7 @@ import { Client, GatewayIntentBits, Events } from "discord.js";
 import initializeCommands from "./helpers/initializeCommands";
 import ClientMemory from "./classes/ClientMemory";
 import { deleteReply } from "./helpers/messageHelper";
+import buttonInteractionHandler from "./helpers/buttonInteractionHandler";
 dotenv.config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
@@ -18,16 +19,17 @@ client.on("ready", async () => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  if (interaction.isButton()) return buttonInteractionHandler(interaction, commandsCollection);
   if (!interaction.isChatInputCommand()) return;
 
-  const commando = commandsCollection.get(interaction.commandName);
-
-  if (!commando) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
   try {
+    const commando = commandsCollection.get(interaction.commandName);
+
+    if (!commando) {
+      console.error(`No command matching ${interaction.commandName} was found.`);
+      return;
+    }
+
     await commando.execute(interaction);
     if (interaction.commandName !== "play") {
       deleteReply(interaction, 10_000);
@@ -45,6 +47,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         ephemeral: true,
       });
     }
+    deleteReply(interaction, 10_000);
   }
 });
 

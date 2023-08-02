@@ -1,11 +1,12 @@
 import { joinVoiceChannel, AudioPlayerStatus } from "@discordjs/voice";
-import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ActionRowComponent, CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
 import buildEmbed from "../helpers/buildEmbed";
 import clientHandler from "../helpers/clientHandler";
 import getVoiceChannel from "../helpers/getVoiceChannel";
 import { deleteReply } from "../helpers/messageHelper";
 import playSound from "../helpers/playSound";
+import rowBuilder from "../helpers/rowBuilder";
 import { searchVideo } from "../helpers/searchVideo";
 import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
@@ -25,13 +26,18 @@ const execute = async (interaction: CommandInteraction) => {
 
     try {
       const video = await playSound(searchTerm);
-      const playerEmbed = await interaction.channel.send({ embeds: [buildEmbed(video, globalData.queue)] });
+      const playerEmbed = await interaction.channel.send({ embeds: [buildEmbed(video, globalData.queue)], components: [rowBuilder()] });
+
+      await interaction.reply("Started echo");
+
+      deleteReply(interaction, 2_000);
 
       if (playerEmbed) {
         globalData.currentVideo = video;
         globalData.playerEmbed = playerEmbed;
       }
     } catch (err) {
+      console.log(err);
       await interaction.reply("Video is restricted, cannot play, leaving the channel.");
       const left = globalData.connection.disconnect();
 

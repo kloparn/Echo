@@ -22,7 +22,7 @@ export default (video: VideoSearchResult, queue: Array<VideoSearchResult>) => {
     .setThumbnail(video?.thumbnail)
     .addFields(...queueFields)
     .setTimestamp()
-    .setFooter({ text: `echo` });
+    .setFooter({ text: `echo` })
 
   return messageEmbed;
 };
