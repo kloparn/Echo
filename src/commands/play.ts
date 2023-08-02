@@ -25,22 +25,19 @@ const execute = async (interaction: CommandInteraction) => {
 
     try {
       const video = await playSound(searchTerm);
-      const successResponse = await interaction.reply("Started echo");
-
-      // globalData.playerEmbed = await interaction.channel.send(new )
-
       const playerEmbed = await interaction.channel.send({ embeds: [buildEmbed(video, globalData.queue)] });
 
-      if (successResponse) {
+      if (playerEmbed) {
         globalData.currentVideo = video;
         globalData.playerEmbed = playerEmbed;
       }
     } catch (err) {
       await interaction.reply("Video is restricted, cannot play, leaving the channel.");
-      globalData.connection.disconnect();
+      const left = globalData.connection.disconnect();
 
-      // we want the player to have a chance to disconnect from the voice channel before destroying the client.
-      setTimeout(clientHandler.destroyClient, 0);
+      if (left) {
+        clientHandler.destroyClient();
+      }
     }
   } else {
     // already connected to a voice channel
@@ -56,7 +53,7 @@ const execute = async (interaction: CommandInteraction) => {
       await interaction.reply("Video is restricted, cannot play");
     }
 
-    // deleteReply(interaction, 10_000);
+    deleteReply(interaction, 10_000);
   }
 };
 

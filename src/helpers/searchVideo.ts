@@ -1,12 +1,16 @@
 import { spawn } from "child_process";
 import yts, { SearchResult, VideoSearchResult } from "yt-search";
+import ytdl from "ytdl-core";
 import getValidVideoUrl from "./getValidVideoUrl";
 import isValidUrl from "./isValidUrl";
-import { testRestrictedVideo } from "./testRestrictedVideo";
 
 if (process.argv[2] === "searchVideoChild") {
-  yts(process.argv[3]).then((value) => {
-    console.log(JSON.stringify(value));
+  yts(process.argv[3]).then((response: SearchResult) => {
+    const [video] = response.all.filter((it: any) => it.type === "video");
+
+    ytdl.getBasicInfo(video.url).then(() => {
+      console.log(JSON.stringify(video));
+    });
   });
 }
 
@@ -18,19 +22,15 @@ const searchVideo = async (searchTerm: string) => {
   const video: any = await new Promise((res, rej) => {
     const worker = spawn(process.execPath, [__filename, "searchVideoChild", searchTerm]);
     worker.stdout.on("data", (data) => {
-      let response: SearchResult = JSON.parse(data.toString());
+      let video: VideoSearchResult = JSON.parse(data.toString());
 
-      const videos = response.all.filter((it: any) => it.type === "video");
+      res(video);
+    });
 
-      res(videos[0]);
+    worker.stderr.on("data", () => {
+      rej("Video is restricted, cannot play");
     });
   });
-
-  try {
-    await testRestrictedVideo(video);
-  } catch (e) {
-    throw new Error("Video is restricted, cannot play");
-  }
 
   return video as VideoSearchResult;
 };

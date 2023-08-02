@@ -8,9 +8,13 @@ const execute = async (interaction: CommandInteraction) => {
   if (globalData.client.voice.adapters.size > 0) {
     globalData.player.stop();
     if (globalData.connection.disconnect()) {
-      await globalData.playerEmbed.delete();
+      if (globalData.playerEmbed.deletable) {
+        await globalData.playerEmbed.delete();
+      }
       clientHandler.destroyClient();
-      await interaction.reply("Stopping the player...");
+      if (interaction.isRepliable()) {
+        await interaction.reply("Stopping the player...");
+      }
     }
   }
 };

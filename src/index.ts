@@ -29,7 +29,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   try {
     await commando.execute(interaction);
-    deleteReply(interaction, 10_000);
+    if (interaction.commandName !== "play") {
+      deleteReply(interaction, 10_000);
+    }
   } catch (error) {
     console.error(error);
     if (interaction.replied || interaction.deferred) {

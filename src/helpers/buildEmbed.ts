@@ -14,8 +14,6 @@ export default (video: VideoSearchResult, queue: Array<VideoSearchResult>) => {
     return items;
   }, []);
 
-  // if (queueFields.length > 3) queueFields.push({ name: "Position: 4+", value: "More to come" });
-
   const messageEmbed = new EmbedBuilder()
     .setColor(0x0099ff)
     .setTitle(`Playing: ${video.title}`)
