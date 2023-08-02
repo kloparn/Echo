@@ -41,9 +41,7 @@ const execute = async (interaction: CommandInteraction) => {
 
       if (left) {
         clientHandler.destroyClient();
-      }
-
-      deleteReply(interaction, 2_000);
+      } 
     }
   } else {
     // already connected to a voice channel
@@ -58,9 +56,8 @@ const execute = async (interaction: CommandInteraction) => {
     } catch (e) {
       await interaction.editReply("Video is restricted, cannot play");
     }
-
-    deleteReply(interaction, 10_000);
   }
+  deleteReply(interaction, 5_000);
 };
 
 export default {
