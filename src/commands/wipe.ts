@@ -7,15 +7,13 @@ import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  const botId = globalData.client.user.id;
-
   const messageManager = interaction.channel.messages;
 
   await interaction.reply("Started wiping the channel history");
 
   const messages = await messageManager.fetch({ limit: 100 });
 
-  messages.filter((m) => m.author.bot)
+  messages.filter((m) => m.author.bot || m.author.id === "184405311681986560");
 
   let counter = 0;
 
