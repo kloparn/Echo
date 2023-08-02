@@ -5,7 +5,7 @@ import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  await interaction.reply("Sorry not done yet");
+  await interaction.editReply("Sorry not done yet");
 };
 
 export default {

@@ -12,16 +12,16 @@ const execute = async (interaction: CommandInteraction) => {
     if (!position) {
       globalData.player.stop();
 
-      await interaction.reply("Skipped current song...");
+      await interaction.editReply("Skipped current song...");
     } else {
       const video = globalData.queue.splice((position as number) - 1, 1)[0];
 
       await globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)]})
 
-      await interaction.reply(`Removed ${video.title} from queue!`);
+      await interaction.editReply(`Removed ${video.title} from queue!`);
     }
   } else {
-    await interaction.reply("Could not perform this action!");
+    await interaction.editReply("Could not perform this action!");
   }
 };
 

@@ -13,7 +13,7 @@ const execute = async (interaction: CommandInteraction) => {
       }
       clientHandler.destroyClient();
       if (interaction.isRepliable()) {
-        await interaction.reply("Stopping the player...");
+        await interaction.editReply("Stopping the player...");
       }
     }
   }

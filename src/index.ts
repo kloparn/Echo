@@ -19,7 +19,7 @@ client.on("ready", async () => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (interaction.isButton()) return buttonInteractionHandler(interaction, commandsCollection);
+  if (interaction.isButton()) return await buttonInteractionHandler(interaction, commandsCollection);
   if (!interaction.isChatInputCommand()) return;
 
   try {
@@ -29,6 +29,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
       console.error(`No command matching ${interaction.commandName} was found.`);
       return;
     }
+
+    await interaction.deferReply();
 
     await commando.execute(interaction);
     if (interaction.commandName !== "play" && interaction.commandName !== "wipe") {
@@ -42,9 +44,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
         ephemeral: true,
       });
     } else {
-      await interaction.reply({
+      await interaction.editReply({
         content: "There was an error while executing this command!",
-        ephemeral: true,
       });
     }
     deleteReply(interaction, 10_000);

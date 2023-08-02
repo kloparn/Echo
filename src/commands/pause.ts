@@ -8,9 +8,9 @@ const execute = async (interaction: CommandInteraction) => {
   if (globalData.player.state.status === AudioPlayerStatus.Playing) {
     globalData.player.pause();
     await entersState(globalData.player, AudioPlayerStatus.Paused, 5000);
-    await interaction.reply("Paused song");
+    await interaction.editReply("Paused song");
   } else {
-    await interaction.reply("Could not perform this action!");
+    await interaction.editReply("Could not perform this action!");
   }
 };
 

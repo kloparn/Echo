@@ -10,7 +10,7 @@ const execute = async (interaction: CommandInteraction) => {
     return str;
   }, "");
 
-  await interaction.reply(!queueString.length ? "Nothing in queue" : queueString);
+  await interaction.editReply(!queueString.length ? "Nothing in queue" : queueString);
 };
 
 export default {

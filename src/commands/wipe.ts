@@ -4,7 +4,7 @@ import { Command } from "../interfaces";
 const execute = async (interaction: CommandInteraction) => {
   const messageManager = interaction.channel.messages;
 
-  await interaction.reply("Started wiping the channel history");
+  await interaction.editReply("Started wiping the channel history");
 
   let messages = await messageManager.fetch({ limit: 100 });
 

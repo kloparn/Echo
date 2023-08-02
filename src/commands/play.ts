@@ -28,7 +28,7 @@ const execute = async (interaction: CommandInteraction) => {
       const video = await playSound(searchTerm);
       const playerEmbed = await interaction.channel.send({ embeds: [buildEmbed(video, globalData.queue)], components: [rowBuilder()] });
 
-      await interaction.reply("Started echo");
+      await interaction.editReply("Started echo");
 
       deleteReply(interaction, 2_000);
 
@@ -38,7 +38,7 @@ const execute = async (interaction: CommandInteraction) => {
       }
     } catch (err) {
       console.log(err);
-      await interaction.reply("Video is restricted, cannot play, leaving the channel.");
+      await interaction.editReply("Video is restricted, cannot play, leaving the channel.");
       const left = globalData.connection.disconnect();
 
       if (left) {
@@ -54,9 +54,9 @@ const execute = async (interaction: CommandInteraction) => {
 
       await globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)] });
 
-      await interaction.reply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
+      await interaction.editReply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
     } catch (e) {
-      await interaction.reply("Video is restricted, cannot play");
+      await interaction.editReply("Video is restricted, cannot play");
     }
 
     deleteReply(interaction, 10_000);
