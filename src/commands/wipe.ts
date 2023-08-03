@@ -1,29 +1,40 @@
-import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { Collection, CommandInteraction, Message, SlashCommandBuilder } from "discord.js";
+import { exit } from "process";
 import { Command } from "../interfaces";
+import resume from "./resume";
 
 const execute = async (interaction: CommandInteraction) => {
   const messageManager = interaction.channel.messages;
 
   await interaction.editReply("Started wiping the channel history");
 
-  let messages = await messageManager.fetch({ limit: 100 });
+  let ealiestMessageId: string;
+  let messages: Collection<string, Message<true>> = new Collection();
 
-  if (messages.values.length === 1) {
-    messages = await messageManager.fetch({ limit: 100 });
+  while (true) {
+    const options = ealiestMessageId ? { limit: 100, before: ealiestMessageId } : { limit: 100 };
+    const fetchedMessages = await messageManager.fetch(options);
+
+    ealiestMessageId = fetchedMessages.last().id;
+
+    for (const [key, value] of fetchedMessages) {
+      messages.set(key, value);
+    }
+
+    if (fetchedMessages.size !== 100) break;
   }
 
-  messages.filter((m) => m.author.bot);
+  messages = messages.filter((m) => m.author.bot && m.deletable);
 
-  let counter = 0;
+  const promiseArray: Array<Promise<Message<true>>> = [];
 
   for (const [, msg] of messages) {
-    if (msg.deletable) {
-      await msg.delete();
-      counter++;
-    }
+    promiseArray.push(msg.delete());
   }
 
-  const textMessage = await interaction.channel.send(`Deleted ${counter} messages from channel`);
+  await Promise.all(promiseArray);
+
+  const textMessage = await interaction.channel.send(`Deleted ${promiseArray.length} messages from channel`);
 
   setTimeout(() => {
     textMessage.delete();
