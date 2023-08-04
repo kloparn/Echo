@@ -1,9 +1,11 @@
 import { Collection, CommandInteraction, Message, SlashCommandBuilder } from "discord.js";
-import { exit } from "process";
 import { Command } from "../interfaces";
-import resume from "./resume";
 
 const execute = async (interaction: CommandInteraction) => {
+  const searchAmount: any = [0, interaction.options?.get("lookBackAmount")?.value];
+
+  searchAmount[1] = searchAmount[1] % 100;
+
   const messageManager = interaction.channel.messages;
 
   await interaction.editReply("Started wiping the channel history");
@@ -11,20 +13,22 @@ const execute = async (interaction: CommandInteraction) => {
   let ealiestMessageId: string;
   let messages: Collection<string, Message<true>> = new Collection();
 
-  while (true) {
+  while (searchAmount[0] < searchAmount[1]) {
     const options = ealiestMessageId ? { limit: 100, before: ealiestMessageId } : { limit: 100 };
     const fetchedMessages = await messageManager.fetch(options);
 
     ealiestMessageId = fetchedMessages.last().id;
 
-    for (const [key, value] of fetchedMessages) {
+    // only adding the bot messages in the "to delete" pile
+    const filteredMessages = fetchedMessages.filter((m) => m.author.bot && m.deletable);
+
+    for (const [key, value] of filteredMessages) {
       messages.set(key, value);
     }
 
     if (fetchedMessages.size !== 100) break;
+    searchAmount[0]++;
   }
-
-  messages = messages.filter((m) => m.author.bot && m.deletable);
 
   const promiseArray: Array<Promise<Message<true>>> = [];
 
@@ -42,6 +46,9 @@ const execute = async (interaction: CommandInteraction) => {
 };
 
 export default {
-  data: new SlashCommandBuilder().setName("wipe").setDescription("Tries to wipe the history of the bot in the current channel"),
+  data: new SlashCommandBuilder()
+    .setName("wipe")
+    .setDescription("Tries to wipe the history of the bot in the current channel")
+    .addNumberOption((option) => option.setName("lookBackAmount").setDescription("How many messages back should i look?").setRequired(true)),
   execute,
 } as Command;
