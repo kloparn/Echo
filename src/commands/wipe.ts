@@ -2,7 +2,7 @@ import { Collection, CommandInteraction, Message, SlashCommandBuilder } from "di
 import { Command } from "../interfaces";
 
 const execute = async (interaction: CommandInteraction) => {
-  const searchAmount: any = [0, interaction.options?.get("lookBackAmount")?.value];
+  const searchAmount: any = [0, interaction.options?.get("look-back-amount")?.value];
 
   searchAmount[1] = searchAmount[1] % 100;
 
@@ -49,6 +49,6 @@ export default {
   data: new SlashCommandBuilder()
     .setName("wipe")
     .setDescription("Tries to wipe the history of the bot in the current channel")
-    .addNumberOption((option) => option.setName("lookBackAmount").setDescription("How many messages back should i look?").setRequired(true)),
+    .addNumberOption((option) => option.setName("look-back-amount").setDescription("How many messages back should i look?").setRequired(true)),
   execute,
 } as Command;
