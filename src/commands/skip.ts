@@ -2,11 +2,12 @@ import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
 import buildEmbed from "../helpers/buildEmbed";
+import getVoiceChannel from "../helpers/getVoiceChannel";
 import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  if (globalData.player.state.status === AudioPlayerStatus.Playing) {
+  if (globalData.player.state.status === AudioPlayerStatus.Playing && getVoiceChannel(interaction)) {
     const position = interaction.options?.get("position")?.value;
 
     if (!position) {
