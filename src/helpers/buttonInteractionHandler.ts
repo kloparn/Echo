@@ -6,7 +6,9 @@ export default async (interaction: ButtonInteraction, commandsCollection: any) =
 
   const commando = commandsCollection.get(response);
 
-  await interaction.deferReply();
+  await interaction.deferReply({
+    ephemeral: true,
+  });
 
   try {
     commando.execute(interaction);
