@@ -14,7 +14,7 @@ const globalData = ClientMemory.getInstance();
 const execute = async (interaction: CommandInteraction) => {
   const searchTerm: any = interaction.options.get("search").value;
 
-  if (!globalData.connection) {
+  if (!globalData.connection && getVoiceChannel(interaction)) {
     // not connected to any voice channel
     const voiceChannel = getVoiceChannel(interaction);
 
@@ -41,7 +41,7 @@ const execute = async (interaction: CommandInteraction) => {
 
       if (left) {
         clientHandler.destroyClient();
-      } 
+      }
     }
   } else {
     // already connected to a voice channel
