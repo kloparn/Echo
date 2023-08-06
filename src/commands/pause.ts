@@ -1,11 +1,12 @@
 import { AudioPlayerStatus, entersState } from "@discordjs/voice";
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
+import getVoiceChannel from "../helpers/getVoiceChannel";
 import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  if (globalData.player.state.status === AudioPlayerStatus.Playing) {
+  if (globalData.player.state.status === AudioPlayerStatus.Playing && getVoiceChannel(interaction)) {
     globalData.player.pause();
     await entersState(globalData.player, AudioPlayerStatus.Paused, 5000);
     await interaction.editReply("Paused song");
