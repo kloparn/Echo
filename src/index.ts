@@ -30,7 +30,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return;
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({
+      ephemeral: true,
+    });
 
     await commando.execute(interaction);
     if (interaction.commandName !== "play" && interaction.commandName !== "wipe") {
