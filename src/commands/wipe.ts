@@ -2,10 +2,6 @@ import { Collection, CommandInteraction, Message, SlashCommandBuilder } from "di
 import { Command } from "../interfaces";
 
 const execute = async (interaction: CommandInteraction) => {
-  const searchAmount: any = [0, interaction.options?.get("look-back-amount")?.value];
-
-  searchAmount[1] = searchAmount[1] % 100;
-
   const messageManager = interaction.channel.messages;
 
   await interaction.editReply("Started wiping the channel history");
@@ -13,7 +9,7 @@ const execute = async (interaction: CommandInteraction) => {
   let ealiestMessageId: string;
   let messages: Collection<string, Message<true>> = new Collection();
 
-  while (searchAmount[0] < searchAmount[1]) {
+  while (true) {
     const options = ealiestMessageId ? { limit: 100, before: ealiestMessageId } : { limit: 100 };
     const fetchedMessages = await messageManager.fetch(options);
 
@@ -27,7 +23,6 @@ const execute = async (interaction: CommandInteraction) => {
     }
 
     if (fetchedMessages.size !== 100) break;
-    searchAmount[0]++;
   }
 
   const promiseArray: Array<Promise<Message<true>>> = [];
@@ -46,9 +41,6 @@ const execute = async (interaction: CommandInteraction) => {
 };
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName("wipe")
-    .setDescription("Tries to wipe the history of the bot in the current channel")
-    .addNumberOption((option) => option.setName("look-back-amount").setDescription("How many messages back should i look?").setRequired(true)),
+  data: new SlashCommandBuilder().setName("wipe").setDescription("Tries to wipe the history of the bot in the current channel"),
   execute,
 } as Command;
