@@ -1,4 +1,4 @@
-import { CommandInteraction, SlashCommandBuilder, User } from "discord.js";
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import { VideoSearchResult } from "yt-search";
 import * as buildEmbed from "../helpers/buildEmbed";
 import * as rowBuilder from "../helpers/rowBuilder";
@@ -15,11 +15,24 @@ const execute = async (interaction: CommandInteraction) => {
 
     interaction.editReply(`Got a search result of ${videos.length}, processing them...`);
 
-    const promiseVideos = videos.map((video) => searchVideo(video.url));
+    const workingVideos: VideoSearchResult[] = [];
 
-    const testedVideos = await Promise.allSettled(promiseVideos);
+    // we only process 4 videos at a time for memory purposes
+    // yes this takes longer, but we give that information to the user!
+    while (workingVideos.length < 4 && videos.length > 0) {
+      const tempVideos = videos.splice(0, 4);
 
-    const workingVideos: VideoSearchResult[] = testedVideos.filter((vid) => vid.status === "fulfilled").map((vid: any) => vid.value);
+      const promiseArr = [];
+      for (const video of tempVideos) {
+        promiseArr.push(searchVideo(video.url));
+      }
+
+      const testedVideos = await Promise.allSettled(promiseArr);
+
+      const _workingVideos = testedVideos.filter((it) => it.status === "fulfilled").map((it: any) => it.value);
+
+      workingVideos.push(..._workingVideos);
+    }
 
     interaction.editReply({
       embeds: [buildEmbed.searchResult(workingVideos)],
