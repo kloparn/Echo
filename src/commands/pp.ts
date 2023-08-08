@@ -49,7 +49,7 @@ const execute = async (interaction: CommandInteraction) => {
 export default {
   data: new SlashCommandBuilder()
     .setName("pp")
-    .setDescription("Search for 5 songs from a given query")
+    .setDescription("Search for 5 playable songs from a given query")
     .addStringOption((option) => option.setName("search").setDescription("Search term for youtube").setRequired(true)),
   execute,
 } as Command;
