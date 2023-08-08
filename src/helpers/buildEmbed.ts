@@ -4,7 +4,7 @@ import ClientMemory from "../classes/ClientMemory";
 
 const globalData = ClientMemory.getInstance();
 
-export default (video: VideoSearchResult, queue: Array<VideoSearchResult>) => {
+const player = (video: VideoSearchResult, queue: Array<VideoSearchResult>) => {
   if (globalData.currentVideo) video = globalData.currentVideo;
 
   const queueFields: any = queue.reduce((items, item, index) => {
@@ -22,7 +22,28 @@ export default (video: VideoSearchResult, queue: Array<VideoSearchResult>) => {
     .setThumbnail(video?.thumbnail)
     .addFields(...queueFields)
     .setTimestamp()
-    .setFooter({ text: `echo` })
+    .setFooter({ text: "echo" });
 
   return messageEmbed;
 };
+
+const searchResult = (videos: VideoSearchResult[]) => {
+  const searchField: any = videos.reduce((items, item, index) => {
+    if (index > 4) return items;
+    items.push({ name: `Result: ${index + 1} | duration: ${item.duration.timestamp}`, value: `${item.title} | <${item.url}>` });
+
+    return items;
+  }, []);
+
+  const messageEmbed = new EmbedBuilder()
+    .setColor(0x0099ff)
+    .setTitle(`Search results`)
+    .setAuthor({ name: "Echo music player" })
+    .addFields(...searchField)
+    .setTimestamp()
+    .setFooter({ text: "echo" });
+
+  return messageEmbed;
+};
+
+export { player, searchResult };

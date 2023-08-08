@@ -35,7 +35,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     });
 
     await commando.execute(interaction);
-    if (interaction.commandName !== "play" && interaction.commandName !== "wipe") {
+    if (interaction.commandName !== "play" && interaction.commandName !== "wipe" && interaction.commandName !== "pp") {
       deleteReply(interaction, 10_000);
     }
   } catch (error) {

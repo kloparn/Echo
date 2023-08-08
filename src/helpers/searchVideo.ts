@@ -14,6 +14,14 @@ if (process.argv[2] === "searchVideoChild") {
   });
 }
 
+if (process.argv[2] === "multipleSearch") {
+  yts(process.argv[3]).then((response: SearchResult) => {
+    const videos = response.all.filter((it: any) => it.type === "video");
+
+    console.log(JSON.stringify(videos));
+  });
+}
+
 const searchVideo = async (searchTerm: string) => {
   if (isValidUrl(searchTerm)) searchTerm = getValidVideoUrl(searchTerm);
 
@@ -22,7 +30,7 @@ const searchVideo = async (searchTerm: string) => {
   const video: any = await new Promise((res, rej) => {
     const worker = spawn(process.execPath, [__filename, "searchVideoChild", searchTerm]);
     worker.stdout.on("data", (data) => {
-      let video: VideoSearchResult = JSON.parse(data.toString());
+      const video: VideoSearchResult = JSON.parse(data.toString());
 
       res(video);
     });
@@ -35,4 +43,20 @@ const searchVideo = async (searchTerm: string) => {
   return video as VideoSearchResult;
 };
 
-export { searchVideo };
+const searchForMultiple = async (searchTerm: string): Promise<VideoSearchResult[]> => {
+  if (isValidUrl(searchTerm)) searchTerm = getValidVideoUrl(searchTerm);
+
+  const videos: VideoSearchResult[] = await new Promise((res, rej) => {
+    const worker = spawn(process.execPath, [__filename, "multipleSearch", searchTerm]);
+
+    worker.stdout.on("data", (data) => {
+      const videos: VideoSearchResult[] = JSON.parse(data.toString());
+
+      res(videos);
+    });
+  });
+
+  return videos as VideoSearchResult[];
+};
+
+export { searchVideo, searchForMultiple };

@@ -6,7 +6,7 @@ import { searchVideo } from "./searchVideo";
 import { AudioPlayerStatus, AudioResource, createAudioResource } from "@discordjs/voice";
 import getValidVideoUrl from "./getValidVideoUrl";
 import { VideoSearchResult } from "yt-search";
-import buildEmbed from "./buildEmbed";
+import * as buildEmbed from "./buildEmbed";
 
 const globalData = ClientMemory.getInstance();
 
@@ -39,7 +39,7 @@ const idleHandler = async () => {
       const resource = createAudioResource(youtubeReadable);
       const video = await playAudio(song, resource);
       globalData.currentVideo = video;
-      await globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)] });
+      await globalData.playerEmbed.edit({ embeds: [buildEmbed.player(video, globalData.queue)] });
     } catch (err) {
       setTimeout(async () => {
         if (globalData?.connection?.disconnect) {

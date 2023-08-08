@@ -1,18 +1,18 @@
-import { joinVoiceChannel, AudioPlayerStatus } from "@discordjs/voice";
-import { ActionRowComponent, CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { joinVoiceChannel } from "@discordjs/voice";
+import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import ClientMemory from "../classes/ClientMemory";
-import buildEmbed from "../helpers/buildEmbed";
+import * as buildEmbed from "../helpers/buildEmbed";
 import clientHandler from "../helpers/clientHandler";
 import getVoiceChannel from "../helpers/getVoiceChannel";
 import { deleteReply } from "../helpers/messageHelper";
 import playSound from "../helpers/playSound";
-import rowBuilder from "../helpers/rowBuilder";
+import * as rowBuilder from "../helpers/rowBuilder";
 import { searchVideo } from "../helpers/searchVideo";
 import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
-const execute = async (interaction: CommandInteraction) => {
-  const searchTerm: any = interaction.options.get("search").value;
+const execute = async (interaction: CommandInteraction, searchTerm?: any) => {
+  searchTerm = interaction?.options?.get("search").value || searchTerm;
 
   if (!globalData.connection && getVoiceChannel(interaction)) {
     // not connected to any voice channel
@@ -26,7 +26,10 @@ const execute = async (interaction: CommandInteraction) => {
 
     try {
       const video = await playSound(searchTerm);
-      const playerEmbed = await interaction.channel.send({ embeds: [buildEmbed(video, globalData.queue)], components: [rowBuilder()] });
+      const playerEmbed = await interaction.channel.send({
+        embeds: [buildEmbed.player(video, globalData.queue)],
+        components: [rowBuilder.playerButtons()],
+      });
 
       await interaction.editReply("Started echo");
 
@@ -50,7 +53,7 @@ const execute = async (interaction: CommandInteraction) => {
       const video = await searchVideo(searchTerm);
       clientHandler.addToQueue(video);
 
-      await globalData.playerEmbed.edit({ embeds: [buildEmbed(video, globalData.queue)] });
+      await globalData.playerEmbed.edit({ embeds: [buildEmbed.player(video, globalData.queue)] });
 
       await interaction.editReply(`Added: ${video.title} to the queue\nPosition in queue: ${globalData.queue.length}`);
     } catch (e) {

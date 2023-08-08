@@ -1,20 +1,32 @@
-import { ButtonInteraction, CommandInteraction } from "discord.js";
+import { ButtonInteraction } from "discord.js";
 import { deleteReply } from "./messageHelper";
 
-export default async (interaction: ButtonInteraction, commandsCollection: any) => {
+export default async (interaction: any, commandsCollection: any) => {
   const response = interaction.customId.toLowerCase();
 
-  const commando = commandsCollection.get(response);
+  let commando = commandsCollection.get(response);
 
   await interaction.deferReply({
     ephemeral: true,
   });
 
-  try {
-    commando.execute(interaction);
-    deleteReply(interaction, 5_000);
-  } catch (e) {
-    console.log(e);
+  // If we could not get the normal commando from the response
+  // we assume it's a reaction from the pp command, so we handle it differently.
+  if (!commando) {
+    commando = commandsCollection.get("play");
+
+    try {
+      commando.execute(interaction, response);
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    try {
+      commando.execute(interaction);
+      deleteReply(interaction, 5_000);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return;
