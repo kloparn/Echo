@@ -16,13 +16,18 @@ const playerButtons = () => {
 };
 
 const searchButtons = (searchResults: string[]) => {
-  const buttons = [
-    new ButtonBuilder().setCustomId(searchResults[0]).setLabel("1").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId(searchResults[1]).setLabel("2").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId(searchResults[2]).setLabel("3").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId(searchResults[3]).setLabel("4").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId(searchResults[4]).setLabel("5").setStyle(ButtonStyle.Primary),
-  ];
+  const buttons = [];
+
+  for (const searchString of searchResults) {
+    if (buttons.length === 5) break;
+
+    buttons.push(
+      new ButtonBuilder()
+        .setCustomId(searchString)
+        .setLabel((buttons.length + 1).toString())
+        .setStyle(ButtonStyle.Primary)
+    );
+  }
 
   const row: ActionRowBuilder<any> = new ActionRowBuilder().addComponents(...buttons);
 
