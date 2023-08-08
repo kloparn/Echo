@@ -6,7 +6,7 @@ import isValidUrl from "./isValidUrl";
 
 if (process.argv[2] === "searchVideoChild") {
   yts(process.argv[3]).then((response: SearchResult) => {
-    const [video] = response.all.filter((it: any) => it.type === "video");
+    const [video] = response.all.filter((it: VideoSearchResult) => it.type === "video");
 
     ytdl.getBasicInfo(video.url).then(() => {
       console.log(JSON.stringify(video));
@@ -16,7 +16,7 @@ if (process.argv[2] === "searchVideoChild") {
 
 if (process.argv[2] === "multipleSearch") {
   yts(process.argv[3]).then((response: SearchResult) => {
-    const videos = response.all.filter((it: any) => it.type === "video");
+    const videos = response.all.filter((it: VideoSearchResult) => it.type === "video");
 
     console.log(JSON.stringify(videos));
   });
@@ -27,7 +27,7 @@ const searchVideo = async (searchTerm: string) => {
 
   // as we want todo this without "pausing" the application we spawn a new child process then get the result
 
-  const video: any = await new Promise((res, rej) => {
+  const video: VideoSearchResult = await new Promise((res, rej) => {
     const worker = spawn(process.execPath, [__filename, "searchVideoChild", searchTerm]);
     worker.stdout.on("data", (data) => {
       const video: VideoSearchResult = JSON.parse(data.toString());
@@ -40,7 +40,7 @@ const searchVideo = async (searchTerm: string) => {
     });
   });
 
-  return video as VideoSearchResult;
+  return video;
 };
 
 const searchForMultiple = async (searchTerm: string): Promise<VideoSearchResult[]> => {

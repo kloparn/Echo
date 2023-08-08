@@ -1,7 +1,8 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, Collection } from "discord.js";
+import { Command } from "../interfaces";
 import { deleteReply } from "./messageHelper";
 
-export default async (interaction: any, commandsCollection: any) => {
+export default async (interaction: ButtonInteraction, commandsCollection: Collection<String, Command>) => {
   const response = interaction.customId.toLowerCase();
 
   let commando = commandsCollection.get(response);

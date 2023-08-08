@@ -11,7 +11,7 @@ import { searchVideo } from "../helpers/searchVideo";
 import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
-const execute = async (interaction: CommandInteraction, searchTerm?: any) => {
+const execute = async (interaction: CommandInteraction, searchTerm?: string | number | true | undefined) => {
   searchTerm = interaction?.options?.get("search").value || searchTerm;
 
   if (!globalData.connection && getVoiceChannel(interaction)) {
@@ -25,7 +25,7 @@ const execute = async (interaction: CommandInteraction, searchTerm?: any) => {
     });
 
     try {
-      const video = await playSound(searchTerm);
+      const video = await playSound(searchTerm as string);
       const playerEmbed = await interaction.channel.send({
         embeds: [buildEmbed.player(video, globalData.queue)],
         components: [rowBuilder.playerButtons()],
@@ -50,7 +50,7 @@ const execute = async (interaction: CommandInteraction, searchTerm?: any) => {
     // already connected to a voice channel
 
     try {
-      const video = await searchVideo(searchTerm);
+      const video = await searchVideo(searchTerm as string);
       clientHandler.addToQueue(video);
 
       await globalData.playerEmbed.edit({ embeds: [buildEmbed.player(video, globalData.queue)] });

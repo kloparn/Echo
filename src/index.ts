@@ -1,16 +1,17 @@
 import dotenv from "dotenv";
-import { Client, GatewayIntentBits, Events } from "discord.js";
+import { Client, GatewayIntentBits, Events, Collection } from "discord.js";
 import initializeCommands from "./helpers/initializeCommands";
 import ClientMemory from "./classes/ClientMemory";
 import { deleteReply } from "./helpers/messageHelper";
 import buttonInteractionHandler from "./helpers/buttonInteractionHandler";
+import { Command } from "./interfaces/index";
 dotenv.config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
 
 ClientMemory.setClient(client);
 
-let commandsCollection;
+let commandsCollection: Collection<String, Command>;
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);

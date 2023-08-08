@@ -9,9 +9,9 @@ import { deleteReply } from "../helpers/messageHelper";
 
 const execute = async (interaction: CommandInteraction) => {
   if (getVoiceChannel(interaction)) {
-    const searchTerm: any = interaction.options.get("search").value;
+    const searchTerm = interaction.options.get("search").value;
 
-    const videos = await searchForMultiple(searchTerm);
+    const videos = await searchForMultiple(searchTerm as string);
 
     interaction.editReply(`Got a search result of ${videos.length}, processing them...`);
 
@@ -29,7 +29,7 @@ const execute = async (interaction: CommandInteraction) => {
 
       const testedVideos = await Promise.allSettled(promiseArr);
 
-      const _workingVideos = testedVideos.filter((it) => it.status === "fulfilled").map((it: any) => it.value);
+      const _workingVideos = testedVideos.filter((it) => it.status === "fulfilled").map((it: PromiseFulfilledResult<VideoSearchResult>) => it.value);
 
       workingVideos.push(..._workingVideos);
     }
