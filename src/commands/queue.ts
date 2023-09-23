@@ -13,9 +13,10 @@ const execute = async (interaction: CommandInteraction) => {
   // Maximum length of a message in discord
   if (queueString.length > 2_000) {
     await interaction.editReply("Sorry! There is a limit on discord messages, try again when fewer songs are in the queue!");
+  } else {
+    await interaction.editReply(!queueString.length ? "Nothing in queue" : queueString);
   }
 
-  await interaction.editReply(!queueString.length ? "Nothing in queue" : queueString);
 };
 
 export default {
