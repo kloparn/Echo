@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import yts, { SearchResult, VideoSearchResult } from "yt-search";
+import yts, { PlaylistItem, SearchResult, VideoSearchResult } from "yt-search";
 import ytdl from "ytdl-core";
 import getValidVideoUrl from "./getValidVideoUrl";
 import isValidUrl from "./isValidUrl";
@@ -59,4 +59,14 @@ const searchForMultiple = async (searchTerm: string): Promise<VideoSearchResult[
   return videos as VideoSearchResult[];
 };
 
-export { searchVideo, searchForMultiple };
+const getPlaylistVideos = async (playlistUrl: string): Promise<PlaylistItem[]> => {
+  if (!isValidUrl(playlistUrl) && !playlistUrl.includes("list=")) throw new Error("Did not retrieve a youtube playlist url!");
+
+  const plistUrl = new URL(playlistUrl);
+
+  const playlist = await yts.search({ listId: plistUrl.searchParams.get("list")});
+
+  return playlist.videos;
+};
+
+export { searchVideo, searchForMultiple, getPlaylistVideos };

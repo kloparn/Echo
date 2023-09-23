@@ -11,8 +11,8 @@ import { searchVideo } from "../helpers/searchVideo";
 import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
-const execute = async (interaction: CommandInteraction, searchTerm?: string | number | true | undefined) => {
-  searchTerm = interaction?.options?.get("search").value || searchTerm;
+const execute = async (interaction: CommandInteraction, searchTerm?: string | number | true | undefined, shouldDeleteReply: boolean = true) => {
+  searchTerm = interaction?.options?.get("search")?.value || searchTerm;
 
   if (!globalData.connection && getVoiceChannel(interaction)) {
     // not connected to any voice channel
@@ -60,7 +60,7 @@ const execute = async (interaction: CommandInteraction, searchTerm?: string | nu
       await interaction.editReply("Video is restricted, cannot play");
     }
   }
-  deleteReply(interaction, 5_000);
+  if (shouldDeleteReply) deleteReply(interaction, 10_000);
 };
 
 export default {
