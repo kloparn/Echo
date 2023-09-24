@@ -21,9 +21,11 @@ const execute = async (interaction: CommandInteraction) => {
         often the message is updated by adding the timeout!
       */
 
+      if (!playlistVideos[i]?.title) continue;
+
       await new Promise((res) => {
         setTimeout(() => {
-          if (i + 1 === videoAmount) play.execute(interaction, playlistVideos[i].title, true);
+          if (i + 1 === videoAmount) play.execute(interaction, playlistVideos[i]?.title, true);
           else play.execute(interaction, playlistVideos[i].title, false);
           res("");
         }, 1_000);
