@@ -13,13 +13,9 @@ const execute = async (interaction: CommandInteraction) => {
     const options = ealiestMessageId ? { limit: 100, before: ealiestMessageId } : { limit: 100 };
     const fetchedMessages = await messageManager.fetch(options);
 
-    const msgs = fetchedMessages.last(5);
+    fetchedMessages.sweep((msg) => !msg.id);
 
-    msgs.forEach((msg) => {
-      if (msg.id) {
-        ealiestMessageId = msg.id;
-      }
-    });
+    ealiestMessageId = fetchedMessages.last().id;
 
     // only adding the bot messages in the "to delete" pile
     const filteredMessages = fetchedMessages.filter((m) => m.author.bot && m.deletable);
