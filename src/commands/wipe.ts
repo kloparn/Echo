@@ -1,4 +1,5 @@
 import { Collection, CommandInteraction, Message, SlashCommandBuilder } from "discord.js";
+import { deleteReply } from "../helpers/messageHelper";
 import { Command } from "../interfaces";
 
 const execute = async (interaction: CommandInteraction) => {
@@ -35,11 +36,9 @@ const execute = async (interaction: CommandInteraction) => {
 
   await Promise.all(promiseArray);
 
-  const textMessage = await interaction.channel.send(`Deleted ${promiseArray.length} messages from channel`);
+  await interaction.editReply(`Deleted ${promiseArray.length} messages from channel`);
 
-  setTimeout(() => {
-    textMessage.delete();
-  }, 5_000);
+  deleteReply(interaction, 5_000);
 };
 
 export default {

@@ -6,7 +6,7 @@ import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  if (globalData.client.voice.adapters.size > 0 && getVoiceChannel(interaction)) {
+  if (globalData.client.voice.adapters.size > 0) {
     globalData.player.stop();
     if (globalData.connection.disconnect()) {
       if (globalData.playerEmbed.deletable) {

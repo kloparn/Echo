@@ -8,42 +8,37 @@ import { Command } from "../interfaces";
 import { deleteReply } from "../helpers/messageHelper";
 
 const execute = async (interaction: CommandInteraction) => {
-  if (getVoiceChannel(interaction)) {
-    const searchTerm = interaction.options.get("search").value;
+  const searchTerm = interaction.options.get("search").value;
 
-    const videos = await searchForMultiple(searchTerm as string);
+  const videos = await searchForMultiple(searchTerm as string);
 
-    interaction.editReply(`Got a search result of ${videos.length}, processing them...`);
+  interaction.editReply(`Got a search result of ${videos.length}, processing them...`);
 
-    const workingVideos: VideoSearchResult[] = [];
+  const workingVideos: VideoSearchResult[] = [];
 
-    // we only process 4 videos at a time for memory purposes
-    // yes this takes longer, but we give that information to the user!
-    while (workingVideos.length < 4 && videos.length > 0) {
-      const tempVideos = videos.splice(0, 4);
+  // we only process 4 videos at a time for memory purposes
+  // yes this takes longer, but we give that information to the user!
+  while (workingVideos.length < 4 && videos.length > 0) {
+    const tempVideos = videos.splice(0, 4);
 
-      const promiseArr = [];
-      for (const video of tempVideos) {
-        promiseArr.push(searchVideo(video.url));
-      }
-
-      const testedVideos = await Promise.allSettled(promiseArr);
-
-      const _workingVideos = testedVideos.filter((it) => it.status === "fulfilled").map((it: PromiseFulfilledResult<VideoSearchResult>) => it.value);
-
-      workingVideos.push(..._workingVideos);
+    const promiseArr = [];
+    for (const video of tempVideos) {
+      promiseArr.push(searchVideo(video.url));
     }
 
-    interaction.editReply({
-      embeds: [buildEmbed.searchResult(workingVideos)],
-      components: [rowBuilder.searchButtons(workingVideos.map((it) => it.url))],
-    });
+    const testedVideos = await Promise.allSettled(promiseArr);
 
-    deleteReply(interaction, 25_000);
-  } else {
-    await interaction.editReply("Could not perform this action!");
-    deleteReply(interaction, 5_000);
+    const _workingVideos = testedVideos.filter((it) => it.status === "fulfilled").map((it: PromiseFulfilledResult<VideoSearchResult>) => it.value);
+
+    workingVideos.push(..._workingVideos);
   }
+
+  interaction.editReply({
+    embeds: [buildEmbed.searchResult(workingVideos)],
+    components: [rowBuilder.searchButtons(workingVideos.map((it) => it.url))],
+  });
+
+  deleteReply(interaction, 25_000);
 };
 
 export default {

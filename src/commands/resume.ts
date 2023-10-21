@@ -6,7 +6,7 @@ import getVoiceChannel from "../helpers/getVoiceChannel";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  if (globalData.player.state.status === AudioPlayerStatus.Paused && getVoiceChannel(interaction)) {
+  if (globalData.player.state.status === AudioPlayerStatus.Paused) {
     globalData.player.unpause();
     await entersState(globalData.player, AudioPlayerStatus.Playing, 5000);
     await interaction.editReply("Continuing the song!");

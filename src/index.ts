@@ -5,6 +5,7 @@ import ClientMemory from "./classes/ClientMemory";
 import { deleteReply } from "./helpers/messageHelper";
 import buttonInteractionHandler from "./helpers/buttonInteractionHandler";
 import { Command } from "./interfaces/index";
+import getVoiceChannel from "./helpers/getVoiceChannel";
 dotenv.config();
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates] });
@@ -20,8 +21,20 @@ client.on("ready", async () => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  // Guard clauses
+
+  // Pressed on the buttons on the music player!
   if (interaction.isButton()) return await buttonInteractionHandler(interaction, commandsCollection);
+
+  // If the giving interaction is not from the chat
   if (!interaction.isChatInputCommand()) return;
+
+  // The user has to be in a voice channel to use the bot, except for the wipe command
+  if (interaction.commandName !== "wipe" && !getVoiceChannel(interaction)) {
+    await interaction.reply({ ephemeral: true, content: "Need to be connected to a voice channel!" });
+    deleteReply(interaction, 3_000);
+    return;
+  }
 
   try {
     const commando = commandsCollection.get(interaction.commandName);
@@ -36,7 +49,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
     });
 
     await commando.execute(interaction);
-    if (interaction.commandName !== "play" && interaction.commandName !== "wipe" && interaction.commandName !== "pp") {
+
+    if (!["play", "wipe", "pp"].reduce((b, r) => (b === true ? true : r === interaction.commandName ? true : false), false)) {
+      console.log("Not a rule obeying command");
       deleteReply(interaction, 10_000);
     }
   } catch (error) {

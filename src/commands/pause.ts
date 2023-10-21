@@ -6,7 +6,7 @@ import { Command } from "../interfaces";
 const globalData = ClientMemory.getInstance();
 
 const execute = async (interaction: CommandInteraction) => {
-  if (globalData.player.state.status === AudioPlayerStatus.Playing && getVoiceChannel(interaction)) {
+  if (globalData.player.state.status === AudioPlayerStatus.Playing) {
     globalData.player.pause();
     await entersState(globalData.player, AudioPlayerStatus.Paused, 5000);
     await interaction.editReply("Paused song");
