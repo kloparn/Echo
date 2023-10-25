@@ -1,9 +1,8 @@
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
-import getVoiceChannel from "../helpers/getVoiceChannel";
 import { Command } from "../interfaces";
-import { deleteReply } from "../helpers/messageHelper";
 import { getPlaylistVideos } from "../helpers/searchVideo";
 import play from "./play";
+import sleep from "../helpers/sleep";
 
 const execute = async (interaction: CommandInteraction) => {
   const playlistUrl = interaction?.options?.get("playlistlink")?.value;
@@ -22,13 +21,10 @@ const execute = async (interaction: CommandInteraction) => {
 
     if (!playlistVideos[i]?.title) continue;
 
-    await new Promise((res) => {
-      setTimeout(() => {
-        if (i + 1 === videoAmount) play.execute(interaction, playlistVideos[i]?.title, true);
-        else play.execute(interaction, playlistVideos[i].title, false);
-        res("");
-      }, 1_000);
-    });
+    await sleep(1000);
+
+    if (i + 1 === videoAmount) play.execute(interaction, playlistVideos[i]?.title, true);
+    else play.execute(interaction, playlistVideos[i].title, false);
   }
 };
 
