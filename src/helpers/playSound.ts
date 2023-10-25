@@ -7,6 +7,7 @@ import { AudioPlayerStatus, AudioResource, createAudioResource } from "@discordj
 import getValidVideoUrl from "./getValidVideoUrl";
 import { VideoSearchResult } from "yt-search";
 import * as buildEmbed from "./buildEmbed";
+import sleep from "./sleep";
 
 const globalData = ClientMemory.getInstance();
 
@@ -20,7 +21,7 @@ const getVideo = async (link) => {
   return video;
 };
 
-const getYoutubeReadable = (link: string) => {
+const getYoutubeReadable = async (link: string) => {
   return ytdl(link, { filter: "audioonly", highWaterMark: 1 << 25 });
 };
 
@@ -32,20 +33,25 @@ const idleHandler = async () => {
     globalData.connection.disconnect();
 
     // we want the player to have a chance to disconnect from the voice channel before destroying the client.
-    setTimeout(clientHandler.destroyClient, 0);
+    await sleep(0);
+    clientHandler.destroyClient();
   } else {
     try {
-      const youtubeReadable = getYoutubeReadable(song.url);
+      const youtubeReadable = await getYoutubeReadable(song.url);
       const resource = createAudioResource(youtubeReadable);
+
+      await sleep(1000);
+
       const video = await playAudio(song, resource);
       globalData.currentVideo = video;
+
       await globalData.playerEmbed.edit({ embeds: [buildEmbed.player(video, globalData.queue)] });
     } catch (err) {
-      setTimeout(async () => {
-        if (globalData?.connection?.disconnect) {
-          await idleHandler();
-        }
-      }, 200);
+      await sleep(200);
+
+      if (globalData?.connection?.disconnect) {
+        await idleHandler();
+      }
     }
   }
 };
@@ -63,7 +69,7 @@ const playAudio = async (video: VideoSearchResult, resource: AudioResource<null>
 
 export default async function playSound(searchTerm: string) {
   const video = await getVideo(searchTerm);
-  const youtubeReadable = getYoutubeReadable(video.url);
+  const youtubeReadable = await getYoutubeReadable(video.url);
 
   const resource = createAudioResource(youtubeReadable);
 
