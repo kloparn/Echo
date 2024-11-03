@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 import yts, { PlaylistItem, SearchResult, VideoSearchResult } from "yt-search";
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";
 import getValidVideoUrl from "./getValidVideoUrl";
 import isValidUrl from "./isValidUrl";
 
