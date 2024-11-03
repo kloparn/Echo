@@ -1,7 +1,7 @@
 import ClientMemory from "../classes/ClientMemory";
 import clientHandler from "./clientHandler";
 import isValidUrl from "./isValidUrl";
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";
 import { searchVideo } from "./searchVideo";
 import { AudioPlayerStatus, AudioResource, createAudioResource } from "@discordjs/voice";
 import getValidVideoUrl from "./getValidVideoUrl";
