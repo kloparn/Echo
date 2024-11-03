@@ -35,7 +35,9 @@ const searchVideo = async (searchTerm: string) => {
       res(video);
     });
 
-    worker.stderr.on("data", () => {
+    worker.stderr.on("data", (err) => {
+      // Log out the information so we can debug this.
+      console.log(err.toString());
       rej("Video is restricted, cannot play");
     });
   });
