@@ -33,12 +33,12 @@ const execute = async (interaction: CommandInteraction) => {
 
     if (!_workingVideos.length && _restrictedVideos.length) {
       interaction.editReply("All vidoes found were restricted, please try again with a different search term.");
-      deleteReply(interaction, 25_000);
+      return deleteReply(interaction, 25_000);
     }
 
     if(!_workingVideos.length) {
       interaction.editReply("No videos found, please try again with a different search term.");
-      deleteReply(interaction, 25_000);
+      return deleteReply(interaction, 25_000);
     };
 
     workingVideos.push(..._workingVideos);
