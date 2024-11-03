@@ -29,6 +29,17 @@ const execute = async (interaction: CommandInteraction) => {
     const testedVideos = await Promise.allSettled(promiseArr);
 
     const _workingVideos = testedVideos.filter((it) => it.status === "fulfilled").map((it: PromiseFulfilledResult<VideoSearchResult>) => it.value);
+    const _restrictedVideos = testedVideos.filter((it) => it.status === "rejected").map((it: PromiseRejectedResult) => it.reason);
+
+    if (!_workingVideos.length && _restrictedVideos.length) {
+      interaction.editReply("All vidoes found were restricted, please try again with a different search term.");
+      deleteReply(interaction, 25_000);
+    }
+
+    if(!_workingVideos.length) {
+      interaction.editReply("No videos found, please try again with a different search term.");
+      deleteReply(interaction, 25_000);
+    };
 
     workingVideos.push(..._workingVideos);
   }
